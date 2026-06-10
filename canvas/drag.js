@@ -27,6 +27,11 @@ const DragEngine = {
      * Handles the initial pointer click/touch grab
      */
     handlePointerDown(e) {
+        // Core Fix: Exit immediately if clicking the hover-save bubble to unblock click events [1]
+        if (e.target.classList.contains('card-save-plus')) {
+            return;
+        }
+
         const card = e.target.closest('.magnet-card');
         if (!card) return;
 
@@ -75,12 +80,11 @@ const DragEngine = {
         }
 
         if (droppedInDict) {
-            // Save word to custom dictionary bank, then remove card from canvas [1]
-            const word = this.activeCard.textContent.trim();
+            // Copy-on-Drop: Appends to custom dictionary but keeps the card active on canvas [1]
+            const word = this.activeCard.dataset.word || this.activeCard.textContent.trim();
             if (typeof StorageEngine !== 'undefined') {
                 StorageEngine.addWordToCustomDictionary(word);
             }
-            this.activeCard.remove();
         } else {
             // 2. Boundary Checking: If dragged outside the visual canvas bounds, auto-delete it
             const padding = 10;

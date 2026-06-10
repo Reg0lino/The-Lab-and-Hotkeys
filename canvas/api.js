@@ -1,6 +1,6 @@
 /**
  * THE LAB // api.js
- * Debounced Multi-Query API Engine (Datamuse Connection)
+ * Debounced Multi-Query API Engine (Includes Dynamic Local Particles Bypass)
  */
 
 const APIEngine = {
@@ -30,8 +30,13 @@ const APIEngine = {
 
         this.inputElement.addEventListener('input', () => {
             clearTimeout(this.debounceTimer);
-            const val = this.inputElement.value.trim();
+            
+            // Bypass input changes if currently looking up local particles [1]
+            if (this.modeSelectElement.value === 'local_particles') {
+                return;
+            }
 
+            const val = this.inputElement.value.trim();
             if (val.length < 2) {
                 this.hideSuggestions();
                 return;
@@ -44,8 +49,17 @@ const APIEngine = {
 
         this.modeSelectElement.addEventListener('change', () => {
             const val = this.inputElement.value.trim();
+            
+            // If local particles selected, ignore search bar and fetch all 200 immediately [1]
+            if (this.modeSelectElement.value === 'local_particles') {
+                this.query('', 'local_particles');
+                return;
+            }
+
             if (val.length >= 2) {
                 this.query(val, this.modeSelectElement.value);
+            } else {
+                this.hideSuggestions();
             }
         });
 
@@ -55,26 +69,43 @@ const APIEngine = {
     },
 
     /**
-     * Executes the debounced fetch request [1]
+     * Executes the debounced fetch request or local bypass [1]
      */
     query(term, mode) {
+        // Local Particles Bypass: load directly from the local word pool [1]
+        if (mode === 'local_particles') {
+            const url = 'data/word_pools/particles.json';
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) throw new Error();
+                    return response.json();
+                })
+                .then(words => {
+                    // Map local array to standard Datamuse object format
+                    const formatted = words.map(w => { return { word: w }; });
+                    this.currentSuggestions = formatted;
+                    this.renderSuggestions(formatted); // Allow rendering all 200 [1]
+                })
+                .catch(() => {
+                    this.suggestionsListElement.innerHTML = '<span style="font-size:12px; font-style:italic; color:var(--neon-orange);">Offline: Please make sure canvas/data/word_pools/particles.json exists.</span>';
+                });
+            return;
+        }
+
         let queryParam = '';
-        
         switch(mode) {
             case 'means_like':        queryParam = `ml=${encodeURIComponent(term)}`; break; [1]
             case 'perfect_rhyme':     queryParam = `rel_rhy=${encodeURIComponent(term)}`; break; [1]
             case 'slant_rhyme':       queryParam = `rel_nry=${encodeURIComponent(term)}`; break; [1]
             case 'consonant_match':   queryParam = `rel_cns=${encodeURIComponent(term)}`; break; [1]
             case 'triggers':          queryParam = `rel_trg=${encodeURIComponent(term)}`; break; [1]
-            case 'adjectives_for':    queryParam = `rel_jja=${encodeURIComponent(term)}`; break; [1]
-            case 'nouns_for':         queryParam = `rel_jjb=${encodeURIComponent(term)}`; break; [1]
+            case 'adjectives_for':    queryParam = `rel_jjb=${encodeURIComponent(term)}`; break; [1]
+            case 'nouns_for':         queryParam = `rel_jja=${encodeURIComponent(term)}`; break; [1]
             case 'synonyms':          queryParam = `rel_syn=${encodeURIComponent(term)}`; break; [1]
             case 'antonyms':          queryParam = `rel_ant=${encodeURIComponent(term)}`; break; [1]
-            case 'sounds_like':       queryParam = `sl=${encodeURIComponent(term)}`; break; [1]
             default:                  queryParam = `ml=${encodeURIComponent(term)}`;
         }
 
-        // Request vocabulary syllables (md=s) [1]
         const url = `https://api.datamuse.com/words?${queryParam}&md=s&max=${this.maxSuggestions}`;
 
         fetch(url)
@@ -84,7 +115,7 @@ const APIEngine = {
             })
             .then(data => {
                 this.currentSuggestions = data;
-                this.renderSuggestions(data);
+                this.renderSuggestions(data); // Constrained to 40 suggestions [1]
             })
             .catch(err => {
                 console.warn("Connection offline or API failed: ", err);
@@ -93,7 +124,7 @@ const APIEngine = {
     },
 
     /**
-     * Renders suggested words as click-spawners [1]
+     * Renders suggested words as flat, compact, spacer-efficient badges [1]
      */
     renderSuggestions(data) {
         if (!this.suggestionsListElement) return;
@@ -108,9 +139,7 @@ const APIEngine = {
             const word = item.word;
             const syllables = item.numSyllables || 1;
 
-            const badgeContainer = document.createElement('div');
-            badgeContainer.className = 'suggestion-item';
-
+            // Resolved: Renders as flat badges directly inside the container [1]
             const badge = document.createElement('div');
             badge.className = 'word-badge';
             badge.textContent = word;
@@ -118,7 +147,6 @@ const APIEngine = {
             
             // Clicking the suggestion spawns it on the canvas
             badge.addEventListener('click', () => {
-                // Resolved: Calls global window-scoped spawner securely
                 if (typeof window.spawnCardElement === 'function' && typeof PlacementEngine !== 'undefined') {
                     const coords = PlacementEngine.findOpenPosition(word, DragEngine.canvasBoard);
                     window.spawnCardElement(word, false, coords.left, coords.top);
@@ -126,24 +154,7 @@ const APIEngine = {
                 }
             });
 
-            // Individual save to vocabulary button [1]
-            const saveBtn = document.createElement('span');
-            saveBtn.textContent = '＋';
-            saveBtn.style.cursor = 'pointer';
-            saveBtn.style.fontSize = '9px';
-            saveBtn.style.color = 'var(--neon-green)';
-            saveBtn.title = "Save to custom dictionary";
-            
-            saveBtn.addEventListener('click', (e) => {
-                e.stopPropagation(); // Stop card from spawning on board
-                if (typeof StorageEngine !== 'undefined') {
-                    StorageEngine.addWordToCustomDictionary(word);
-                }
-            });
-
-            badgeContainer.appendChild(badge);
-            badgeContainer.appendChild(saveBtn);
-            this.suggestionsListElement.appendChild(badgeContainer);
+            this.suggestionsListElement.appendChild(badge);
         });
 
         if (this.suggestionsContainer) {

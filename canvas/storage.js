@@ -1,6 +1,6 @@
 /**
  * THE LAB // storage.js
- * Persistent Multi-Draft & User-Curated Dictionary Engine
+ * Persistent Multi-Draft & User-Curated Dictionary Engine (Data Attribute Aligned)
  */
 
 const StorageEngine = {
@@ -66,9 +66,9 @@ const StorageEngine = {
     },
 
     /**
-     * Merges an array of words (like a "Save All" query) into the custom dictionary in one action [1]
+     * Merges an array of words (like a "Save All" query) into the custom dictionary [1]
      */
-    saveAllToCustomDictionary(wordsArray) {
+    async saveAllToCustomDictionary(wordsArray) {
         if (!wordsArray || wordsArray.length === 0) return;
 
         let addedCount = 0;
@@ -84,18 +84,19 @@ const StorageEngine = {
             localStorage.setItem(this.customDictionaryKey, JSON.stringify(this.customDictionary));
             this.renderCustomDictionaryBank();
             this.triggerVisualSavedIndicator();
-            alert(`Added ${addedCount} new words to your custom dictionary.`);
+            // Custom modal alert instead of browser alert [1]
+            await window.customAlert("Dictionary Updated", `Successfully added ${addedCount} new words to your custom dictionary.`);
         } else {
-            alert("All suggested words are already stored in your custom dictionary.");
+            await window.customAlert("Custom Dictionary", "All suggested words are already stored in your custom dictionary.");
         }
     },
 
     /**
      * Generates and downloads a clean .txt file of your custom vocabulary [1]
      */
-    exportDictionaryAsTXT() {
+    async exportDictionaryAsTXT() {
         if (this.customDictionary.length === 0) {
-            alert("Your custom dictionary is currently empty.");
+            await window.customAlert("Empty Dictionary", "Your custom dictionary is currently empty. Add words first.");
             return;
         }
 
@@ -111,6 +112,16 @@ const StorageEngine = {
     },
 
     /**
+     * Wipes out all saved words inside your custom vocabulary cache [1]
+     */
+    clearCustomDictionary() {
+        this.customDictionary = [];
+        localStorage.setItem(this.customDictionaryKey, JSON.stringify(this.customDictionary));
+        this.renderCustomDictionaryBank();
+        this.triggerVisualSavedIndicator();
+    },
+
+    /**
      * Renders the custom saved words inside their own distinct UI section [1]
      */
     renderCustomDictionaryBank() {
@@ -120,14 +131,19 @@ const StorageEngine = {
         bankContainer.innerHTML = '';
         
         if (this.customDictionary.length === 0) {
-            bankContainer.innerHTML = '<span style="font-size:12px; font-style:italic; color:var(--text-secondary);">Dictionary is empty. Click ＋ on suggestions or drag cards here to collect words.</span>';
+            bankContainer.innerHTML = '<span style="font-size:12px; font-style:italic; color:var(--text-secondary);">Dictionary is empty. Click suggestions or drag cards here to collect words.</span>';
             return;
         }
 
-        // Sort alphabetically for quick reference
         const sorted = [...this.customDictionary].sort();
 
         sorted.forEach(word => {
+            // Container for hover close positioning
+            const badgeContainer = document.createElement('div');
+            badgeContainer.className = 'custom-badge-container';
+            badgeContainer.style.position = 'relative';
+            badgeContainer.style.display = 'inline-block';
+
             const badge = document.createElement('div');
             badge.className = 'word-badge';
             badge.textContent = word;
@@ -142,17 +158,26 @@ const StorageEngine = {
                 }
             });
 
-            // Double click in the dictionary bank to delete the word from your list
-            badge.addEventListener('dblclick', (e) => {
-                e.stopPropagation();
-                if (confirm(`Remove "${word}" from your saved custom dictionary?`)) {
+            // Clean Deletion: Tiny hover-X element decouples deletion from clicking [1]
+            const deleteIcon = document.createElement('span');
+            deleteIcon.className = 'dictionary-badge-delete-x';
+            deleteIcon.textContent = '✕';
+            deleteIcon.title = "Delete from dictionary bank (Click to delete)";
+            
+            // Re-written: uses window.customConfirm to prevent browser alerts [1]
+            deleteIcon.addEventListener('click', async (e) => {
+                e.stopPropagation(); // Stop card from spawning on board
+                const confirmed = await window.customConfirm("Remove Word", `Are you sure you want to remove "${word}" from your saved custom dictionary?`);
+                if (confirmed) {
                     this.customDictionary = this.customDictionary.filter(w => w !== word);
                     localStorage.setItem(this.customDictionaryKey, JSON.stringify(this.customDictionary));
                     this.renderCustomDictionaryBank();
                 }
             });
 
-            bankContainer.appendChild(badge);
+            badgeContainer.appendChild(badge);
+            badgeContainer.appendChild(deleteIcon);
+            bankContainer.appendChild(badgeContainer);
         });
     },
 
@@ -164,7 +189,8 @@ const StorageEngine = {
         const cards = Array.from(this.boardElement.querySelectorAll('.magnet-card'));
         const wordData = cards.map(card => {
             return {
-                text: card.textContent,
+                // Aligned Fix: Read from clean custom dataset instead of textContent [1]
+                text: card.dataset.word || card.textContent.trim(), 
                 isCustom: card.classList.contains('custom-word'),
                 left: card.style.left,
                 top: card.style.top

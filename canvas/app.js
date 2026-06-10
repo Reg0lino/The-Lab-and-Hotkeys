@@ -18,11 +18,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const clearBoardBtn = document.getElementById('clear-board-btn');
     const exportPngBtn = document.getElementById('export-png-btn');
     const exportDictTxtBtn = document.getElementById('export-dictionary-txt-btn');
+    const clearDictBtn = document.getElementById('clear-dictionary-btn');
+    const saveBoardBtn = document.getElementById('save-board-btn');
     
     // API Suggestions Elements
     const suggestionsDrawer = document.getElementById('suggestions-drawer');
     const suggestionsList = document.getElementById('suggestions-list');
     const saveAllSuggestionsBtn = document.getElementById('save-all-suggestions-btn');
+    
+    // Bulk spawner buttons [1]
+    const addTop5Btn = document.getElementById('add-top-5-btn');
+    const addTop10Btn = document.getElementById('add-top-10-btn');
+    const addTop20Btn = document.getElementById('add-top-20-btn');
+    const randomWordBtn = document.getElementById('random-word-btn');
     
     // Chord & Progression Reference Elements
     const chordRootSelect = document.getElementById('chord-root-select');
@@ -30,37 +38,147 @@ document.addEventListener('DOMContentLoaded', () => {
     const chordTabsTableBody = document.getElementById('chord-tabs-table-body');
     const progressionDirSelect = document.getElementById('progression-dir-select');
     const progressionsTableBody = document.getElementById('progressions-table-body');
-    
-    // Rhyme Tool Elements
-    const rhymeSearchInput = document.getElementById('rhyme-search-input');
-    const rhymeSuggestionsList = document.getElementById('rhyme-suggestions-list');
 
     let rhymeDebounceTimer = null;
 
-    // ==========================================================================
-    // 2. THEME PERSISTENCE CONFIGURATION
-    // ==========================================================================
-    const savedTheme = localStorage.getItem('the_lab_active_theme') || 'theme-g910';
-    document.body.className = savedTheme;
-    themeSelect.value = savedTheme;
-    
-    themeSelect.addEventListener('change', () => {
-        document.body.className = themeSelect.value;
-        localStorage.setItem('the_lab_active_theme', themeSelect.value);
-    });
+    // Master memory array for the dynamic randomizer [1]
+    window.masterVocabularyPool = [];
 
     // ==========================================================================
-    // 3. GLOBAL SPAWNER EXPOSITION
+    // 2. IN-WINDOW PROMISE MODAL OVERLAYS (RESOLVES BROWSER POPUPS RISK) [1]
+    // ==========================================================================
+    window.customAlert = function(title, message) {
+        return new Promise((resolve) => {
+            const overlay = document.getElementById('custom-modal');
+            const titleEl = document.getElementById('modal-title');
+            const bodyEl = document.getElementById('modal-body');
+            const confirmBtn = document.getElementById('modal-btn-confirm');
+            const cancelBtn = document.getElementById('modal-btn-cancel');
+
+            titleEl.textContent = title.toUpperCase();
+            bodyEl.textContent = message;
+            cancelBtn.style.display = 'none'; // Hide cancel button for simple alerts
+            overlay.style.display = 'flex';
+
+            const onConfirm = () => {
+                overlay.style.display = 'none';
+                confirmBtn.removeEventListener('click', onConfirm);
+                resolve();
+            };
+
+            confirmBtn.addEventListener('click', onConfirm);
+        });
+    };
+
+    window.customConfirm = function(title, message) {
+        return new Promise((resolve) => {
+            const overlay = document.getElementById('custom-modal');
+            const titleEl = document.getElementById('modal-title');
+            const bodyEl = document.getElementById('modal-body');
+            const confirmBtn = document.getElementById('modal-btn-confirm');
+            const cancelBtn = document.getElementById('modal-btn-cancel');
+
+            titleEl.textContent = title.toUpperCase();
+            bodyEl.textContent = message;
+            cancelBtn.style.display = 'inline-block'; // Show cancel button for confirmations
+            overlay.style.display = 'flex';
+
+            const cleanup = (result) => {
+                overlay.style.display = 'none';
+                confirmBtn.removeEventListener('click', onConfirm);
+                cancelBtn.removeEventListener('click', onCancel);
+                resolve(result);
+            };
+
+            const onConfirm = () => cleanup(true);
+            const onCancel = () => cleanup(false);
+
+            confirmBtn.addEventListener('click', onConfirm);
+            cancelBtn.addEventListener('click', onCancel);
+        });
+    };
+
+    // ==========================================================================
+    // 3. DYNAMIC JSON THEME LOADER ENGINE [1]
+    // ==========================================================================
+    const loadDynamicThemesList = () => {
+        if (!themeSelect) return;
+
+        fetch('data/themes.json')
+            .then(response => {
+                if (!response.ok) throw new Error();
+                return response.json();
+            })
+            .then(themes => {
+                themeSelect.innerHTML = '';
+                
+                // Read local active choice from memory cache [1]
+                const savedTheme = localStorage.getItem('the_lab_active_theme') || 'theme-g910';
+                
+                themes.forEach(t => {
+                    const opt = document.createElement('option');
+                    opt.value = t.value;
+                    opt.textContent = t.label;
+                    if (t.value === savedTheme) {
+                        opt.selected = true;
+                        document.body.className = savedTheme;
+                    }
+                    themeSelect.appendChild(opt);
+                });
+
+                // Listen for changes
+                themeSelect.addEventListener('change', () => {
+                    document.body.className = themeSelect.value;
+                    localStorage.setItem('the_lab_active_theme', themeSelect.value);
+                });
+            })
+            .catch(err => {
+                console.warn("Themes configuration file missing offline. Loading hardcoded default. ", err);
+                themeSelect.innerHTML = '<option value="theme-g910" selected>1. G910 HUD (DAW Default)</option>';
+                document.body.className = 'theme-g910';
+            });
+    };
+
+    // Load active themes first [1]
+    loadDynamicThemesList();
+
+    // ==========================================================================
+    // 4. GLOBAL SPAWNER EXPOSITION (WITH CARD-HOVER SAVE BINDINGS) [1]
     // ==========================================================================
     window.spawnCardElement = function(text, isCustom, left, top) {
         if (!board) return null;
         
         const card = document.createElement('div');
         card.className = 'magnet-card' + (isCustom ? ' custom-word' : '');
-        card.textContent = text;
         card.style.left = left + 'px';
         card.style.top = top + 'px';
+        card.style.overflow = 'visible'; // Ensures hover elements sits outside boundary bounds
         
+        // Core Fix: Store the clean, raw word inside a custom HTML data attribute [1]
+        card.dataset.word = text;
+        
+        // Wrap text inside a child span to isolate from hover elements
+        const textSpan = document.createElement('span');
+        textSpan.textContent = text;
+        card.appendChild(textSpan);
+
+        // Integrated: Glowing green hover-save '+' button [1]
+        const savePlus = document.createElement('span');
+        savePlus.className = 'card-save-plus';
+        savePlus.textContent = '＋';
+        savePlus.title = "Copy word to persistent saved vocabulary bank";
+        
+        // Non-bubbling click handler prevents card dragging conflicts
+        savePlus.addEventListener('click', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            if (typeof StorageEngine !== 'undefined') {
+                StorageEngine.addWordToCustomDictionary(text.trim());
+            }
+        });
+
+        card.appendChild(savePlus);
+
         // Double-click to delete card securely
         card.addEventListener('dblclick', () => {
             card.remove();
@@ -72,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ==========================================================================
-    // 4. ENGINE INITIALIZATION
+    // 5. ENGINE INITIALIZATION
     // ==========================================================================
     if (typeof DragEngine !== 'undefined') DragEngine.init(board);
     if (typeof StorageEngine !== 'undefined') StorageEngine.init(draftSelect, board);
@@ -80,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof APIEngine !== 'undefined') APIEngine.init(customWordInput, apiModeSelect, suggestionsDrawer, suggestionsList, saveAllSuggestionsBtn);
 
     // ==========================================================================
-    // 5. CHORD TRANSPOSER ENGINE (Aligned to read flat JSON keys) [1]
+    // 6. CHORD TRANSPOSER ENGINE (Aligned to read flat JSON keys) [1]
     // ==========================================================================
     const loadTranscribedChords = () => {
         if (!chordRootSelect || !chordTuningSelect || !chordTabsTableBody) return;
@@ -128,16 +246,16 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .catch(err => {
                 console.warn("Could not fetch relative chord JSON: ", err);
-                chordTabsTableBody.innerHTML = '<tr><td colspan="3" style="text-align:center; font-style:italic; color:var(--neon-orange);">Offline: Please make sure canvas/data/chords/ folder contains correct JSON files.</td></tr>';
+                chordTabsTableBody.innerHTML = '<tr><td colspan="3" style="text-align:center; font-style:italic; color:var(--neon-orange);">Offline: Please make sure data/chords/ folder contains correct JSON files.</td></tr>';
             });
     };
 
     chordRootSelect.addEventListener('change', loadTranscribedChords);
     chordTuningSelect.addEventListener('change', loadTranscribedChords);
-    loadTranscribedChords(); // Initial run
+    loadTranscribedChords();
 
     // ==========================================================================
-    // 6. DYNAMIC OFFLINE WORD POOL LOADER [1]
+    // 7. DYNAMIC OFFLINE WORD POOL LOADER [1]
     // ==========================================================================
     const loadWordPool = (poolId, containerId) => {
         const container = document.getElementById(containerId);
@@ -151,13 +269,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 return response.json();
             })
             .then(words => {
+                // Dynamically concat loaded words directly to the master randomizer pool [1]
+                window.masterVocabularyPool = window.masterVocabularyPool.concat(words);
+
                 container.innerHTML = '';
                 words.forEach(word => {
                     const badge = document.createElement('div');
                     badge.className = 'word-badge';
                     badge.textContent = word;
 
-                    // Clicking the static word badge spawns it on the canvas board
                     badge.addEventListener('click', () => {
                         if (typeof window.spawnCardElement === 'function' && typeof PlacementEngine !== 'undefined') {
                             const coords = PlacementEngine.findOpenPosition(word, board);
@@ -179,9 +299,10 @@ document.addEventListener('DOMContentLoaded', () => {
     loadWordPool('nouns', 'nouns-bank');
     loadWordPool('adjectives', 'adjectives-bank');
     loadWordPool('esoteric', 'esoteric-bank');
+    loadWordPool('particles', 'particles-bank');
 
     // ==========================================================================
-    // 7. MULTI-DRAFT UI BINDINGS
+    // 8. MULTI-DRAFT UI BINDINGS (CUSTOM POPUPS TRANSITION) [1]
     // ==========================================================================
     createDraftBtn.addEventListener('click', () => {
         const name = newDraftInput.value.trim();
@@ -199,12 +320,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    deleteDraftBtn.addEventListener('click', () => {
+    deleteDraftBtn.addEventListener('click', async () => {
         const activeId = StorageEngine.activeProjectId;
         const project = StorageEngine.projects.find(p => p.id === activeId);
         if (!project) return;
         
-        if (confirm(`Confirm deletion of the draft: "${project.name}"? This action cannot be undone.`)) {
+        const confirmed = await window.customConfirm("Confirm Delete", `Are you sure you want to permanently delete the draft: "${project.name}"?`);
+        if (confirmed) {
             StorageEngine.deleteProject(activeId);
         }
     });
@@ -214,7 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ==========================================================================
-    // 8. CUSTOM WORD SPAWNER BINDINGS
+    // 9. CUSTOM & BULK WORD SPAWNER BINDINGS [1]
     // ==========================================================================
     const triggerCustomWordSpawn = () => {
         const text = customWordInput.value.trim();
@@ -233,64 +355,79 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Enter') triggerCustomWordSpawn();
     });
 
+    // Add Top 5 Suggestions [1]
+    if (addTop5Btn) {
+        addTop5Btn.addEventListener('click', () => {
+            if (typeof APIEngine === 'undefined' || APIEngine.currentSuggestions.length === 0) return;
+            const top5 = APIEngine.currentSuggestions.slice(0, 5);
+            top5.forEach(item => {
+                if (typeof window.spawnCardElement === 'function' && typeof PlacementEngine !== 'undefined') {
+                    const coords = PlacementEngine.findOpenPosition(item.word, board);
+                    window.spawnCardElement(item.word, false, coords.left, coords.top);
+                }
+            });
+            StorageEngine.saveActiveDraft();
+        });
+    }
+
+    // Add Top 10 Suggestions [1]
+    if (addTop10Btn) {
+        addTop10Btn.addEventListener('click', () => {
+            if (typeof APIEngine === 'undefined' || APIEngine.currentSuggestions.length === 0) return;
+            const top10 = APIEngine.currentSuggestions.slice(0, 10);
+            top10.forEach(item => {
+                if (typeof window.spawnCardElement === 'function' && typeof PlacementEngine !== 'undefined') {
+                    const coords = PlacementEngine.findOpenPosition(item.word, board);
+                    window.spawnCardElement(item.word, false, coords.left, coords.top);
+                }
+            });
+            StorageEngine.saveActiveDraft();
+        });
+    }
+
+    // Add Top 20 Suggestions
+    if (addTop20Btn) {
+        addTop20Btn.addEventListener('click', () => {
+            if (typeof APIEngine === 'undefined' || APIEngine.currentSuggestions.length === 0) return;
+            const top20 = APIEngine.currentSuggestions.slice(0, 20);
+            top20.forEach(item => {
+                if (typeof window.spawnCardElement === 'function' && typeof PlacementEngine !== 'undefined') {
+                    const coords = PlacementEngine.findOpenPosition(item.word, board);
+                    window.spawnCardElement(item.word, false, coords.left, coords.top);
+                }
+            });
+            StorageEngine.saveActiveDraft();
+        });
+    }
+
+    // Integrated: Dynamic 🎲 Random Word Spawner (Triggers live API fetch with active mode) [1]
+    if (randomWordBtn) {
+        randomWordBtn.addEventListener('click', () => {
+            if (!window.masterVocabularyPool || window.masterVocabularyPool.length === 0) {
+                window.customAlert("System Offline", "The local vocabulary pools have not loaded. Make sure canvas/data/word_pools/ directory is fully populated.");
+                return;
+            }
+
+            // Pick a random word from the dynamically aggregated offline database [1]
+            const randomWord = window.masterVocabularyPool[Math.floor(Math.random() * window.masterVocabularyPool.length)];
+
+            // Inject the rolled word into the search input field [1]
+            customWordInput.value = randomWord;
+
+            // Trigger the live API search query immediately using your active dropdown query mode [1]
+            if (typeof APIEngine !== 'undefined') {
+                APIEngine.query(randomWord, apiModeSelect.value);
+            }
+        });
+    }
+
     // ==========================================================================
-    // 9. SIMPLIFIED RHYMING TOOL [1]
-    // ==========================================================================
-    rhymeSearchInput.addEventListener('input', () => {
-        clearTimeout(rhymeDebounceTimer);
-        const val = rhymeSearchInput.value.trim();
-
-        if (val.length < 2) {
-            rhymeSuggestionsList.innerHTML = '<span style="font-size:12px; font-style:italic; color:var(--text-secondary);">Type a word above to see real-time matches. Click on a rhyme to drop it onto your canvas.</span>';
-            return;
-        }
-
-        // Debounce threshold set to 500ms to protect endpoints [1]
-        rhymeDebounceTimer = setTimeout(() => {
-            rhymeSuggestionsList.innerHTML = '<span style="font-size:12px; font-style:italic; color:var(--text-secondary);">Querying Datamuse Rhyme database...</span>';
-            
-            const url = `https://api.datamuse.com/words?rel_rhy=${encodeURIComponent(val)}&max=20`;
-
-            fetch(url)
-                .then(response => {
-                    if (!response.ok) throw new Error('API server returned error');
-                    return response.json();
-                })
-                .then(data => {
-                    rhymeSuggestionsList.innerHTML = '';
-                    if (!data || data.length === 0) {
-                        rhymeSuggestionsList.innerHTML = '<span style="font-size:12px; font-style:italic;">No perfect rhymes found.</span>';
-                        return;
-                    }
-                    data.forEach(item => {
-                        const badge = document.createElement('div');
-                        badge.className = 'word-badge';
-                        badge.textContent = item.word;
-
-                        badge.addEventListener('click', () => {
-                            const coords = PlacementEngine.findOpenPosition(item.word, board);
-                            window.spawnCardElement(item.word, false, coords.left, coords.top);
-                            StorageEngine.saveActiveDraft();
-                        });
-
-                        rhymeSuggestionsList.appendChild(badge);
-                    });
-                })
-                .catch(err => {
-                    console.warn("Connection offline or Rhyme API failed: ", err);
-                    rhymeSuggestionsList.innerHTML = '<span style="font-size:12px; font-style:italic; color:var(--neon-orange);">Offline: Rhyming API unavailable.</span>';
-                });
-        }, 500);
-    });
-
-    // ==========================================================================
-    // 10. CANVAS SYSTEM UTILITIES (COPY TEXT & CLEAR BOARD)
+    // 10. CANVAS SYSTEM UTILITIES (COPY TEXT, CLEAR BOARD, CLEAR DICTIONARY, SAVE BOARD) [1]
     // ==========================================================================
     copyTextBtn.addEventListener('click', () => {
         const cards = Array.from(board.querySelectorAll('.magnet-card'));
         if (cards.length === 0) return;
 
-        // Sort cards logically: reading-order (row segments)
         cards.sort((a, b) => {
             const topA = parseFloat(a.style.top);
             const topB = parseFloat(b.style.top);
@@ -322,14 +459,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const exportedText = words.join('\n');
         navigator.clipboard.writeText(exportedText).then(() => {
-            alert("Copied canvas lyrics to clipboard:\n\n" + exportedText);
+            window.customAlert("Copied to Clipboard", "Your canvas lyrics have been copied to your clipboard.");
         }).catch(err => {
             console.error("Failed to copy clipboard data: ", err);
         });
     });
 
-    clearBoardBtn.addEventListener('click', () => {
-        if (confirm("Clear all active word cards from the canvas?")) {
+    clearBoardBtn.addEventListener('click', async () => {
+        const confirmed = await window.customConfirm("Clear Board", "Are you sure you want to clear all active word cards from your canvas?");
+        if (confirmed) {
             board.innerHTML = '';
             StorageEngine.saveActiveDraft();
         }
@@ -339,39 +477,58 @@ document.addEventListener('DOMContentLoaded', () => {
         StorageEngine.exportDictionaryAsTXT();
     });
 
+    clearDictBtn.addEventListener('click', async () => {
+        const confirmed = await window.customConfirm("Clear Dictionary", "Are you sure you want to permanently clear your saved custom vocabulary dictionary? This action cannot be undone.");
+        if (confirmed) {
+            StorageEngine.clearCustomDictionary();
+        }
+    });
+
+    // Integrated: Save Board click handler (Saves all active canvas words to vocabulary in one pass) [1]
+    if (saveBoardBtn) {
+        saveBoardBtn.addEventListener('click', () => {
+            const cards = Array.from(board.querySelectorAll('.magnet-card'));
+            if (cards.length === 0) {
+                window.customAlert("Save Board", "Your canvas is currently empty. Spawn some words first.");
+                return;
+            }
+
+            // Aligned Fix: Maps using clean data-attributes instead of textContent [1]
+            const wordsArray = cards.map(card => card.dataset.word);
+            if (typeof StorageEngine !== 'undefined') {
+                StorageEngine.saveAllToCustomDictionary(wordsArray);
+            }
+        });
+    }
+
     // ==========================================================================
-    // 11. THEME-AWARE DYNAMIC PNG SNAPSHOT ENGINE
+    // 12. THEME-AWARE DYNAMIC PNG SNAPSHOT ENGINE
     // ==========================================================================
     exportPngBtn.addEventListener('click', () => {
         const cards = Array.from(board.querySelectorAll('.magnet-card'));
         if (cards.length === 0) {
-            alert("The board is empty. Spawn some words first before exporting.");
+            window.customAlert("Empty Board", "The board is empty. Spawn some words first before exporting.");
             return;
         }
 
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
 
-        // Match canvas sizes to DOM container sizing
         const width = board.offsetWidth || 800;
         const height = board.offsetHeight || 480;
         canvas.width = width;
         canvas.height = height;
 
-        // Fetch real-time active system CSS parameters
         const bodyStyle = getComputedStyle(document.body);
         const bgMain = bodyStyle.getPropertyValue('--bg-main').trim() || '#040409';
         const cardAlt = bodyStyle.getPropertyValue('--bg-card-alt').trim() || '#161633';
         const textPrimary = bodyStyle.getPropertyValue('--text-primary').trim() || '#ffffff';
-        const theme1 = bodyStyle.getPropertyValue('--theme-color-1').trim() || '#ffb700';
         const theme2 = bodyStyle.getPropertyValue('--theme-color-2').trim() || '#ff7a00';
         const theme3 = bodyStyle.getPropertyValue('--theme-color-3').trim() || '#2b2b3d';
 
-        // Paint Background
         ctx.fillStyle = bgMain;
         ctx.fillRect(0, 0, width, height);
 
-        // Paint Faint Grid
         ctx.strokeStyle = 'rgba(157, 78, 221, 0.05)';
         ctx.lineWidth = 1;
         const gridSize = 20;
@@ -388,7 +545,6 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.stroke();
         }
 
-        // Render each card onto vector plane
         cards.forEach(card => {
             const cardX = parseFloat(card.style.left) || 0;
             const cardY = parseFloat(card.style.top) || 0;
@@ -396,21 +552,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const cardH = card.offsetHeight;
             const isCustom = card.classList.contains('custom-word');
 
-            // Set card colors
             const borderStroke = isCustom ? theme2 : theme3;
 
-            // Draw card background
             ctx.fillStyle = cardAlt;
             ctx.beginPath();
-            ctx.roundRect(cardX, cardY, cardW, cardH, 4); // Standard 4px radius
+            ctx.roundRect(cardX, cardY, cardW, cardH, 4);
             ctx.fill();
 
-            // Draw border line
             ctx.strokeStyle = borderStroke;
             ctx.lineWidth = 1.5;
             ctx.stroke();
 
-            // Render Monospace font matching system
             ctx.fillStyle = textPrimary;
             ctx.font = 'bold 13px Consolas, Courier New, monospace';
             ctx.textAlign = 'center';
@@ -418,7 +570,6 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.fillText(card.textContent, cardX + (cardW / 2), cardY + (cardH / 2) + 1);
         });
 
-        // Generate Data URI and trigger automatic download
         const activeProject = StorageEngine.projects.find(p => p.id === StorageEngine.activeProjectId);
         const rawName = activeProject ? activeProject.name : 'sketch';
         const safeName = rawName.toLowerCase().replace(/[^a-z0-9]/g, '_');
