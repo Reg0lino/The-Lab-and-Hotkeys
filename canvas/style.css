@@ -1,0 +1,705 @@
+/* THE LAB // style.css */
+
+/* ==========================================================================
+   1. STRUCTURAL BASELINE VARIABLES
+   ========================================================================== */
+:root {
+    --base-font-size: 16px;
+    --title-font-size: 24px;
+    --h3-font-size: 17px;
+    --card-padding: 18px;
+    
+    --font-mono: "Consolas", "Courier New", Courier, monospace;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ==========================================================================
+   2. THE 11 HIGH-CONTRAST DARK MODE THEME PRESETS
+   ========================================================================== */
+
+/* Theme 1 (Default Theme): G910 (Matches your root Logitech HUD) */
+body, body.theme-g910 {
+    --bg-main: #07070a;
+    --bg-sidebar: #0e0e13;
+    --bg-card: #14141d;
+    --bg-card-alt: #1a1a26;
+    --border-color: #2b2b3d;
+    --text-primary: #ffffff;
+    --text-secondary: #8c8c9e;
+    --accent-glow: #ffb700; 
+    --theme-color-1: #ffb700; /* G910 Neon Yellow */
+    --theme-color-2: #ff7a00; /* Logitech Warning Orange */
+    --theme-color-3: #2a2a35; /* Cool Slate */
+}
+
+/* Theme 2: Synthwave (Vibrant Hot-Magenta, Cyan & Purple) */
+body.theme-synthwave {
+    --bg-main: #06060c;
+    --bg-sidebar: #0b0b14;
+    --bg-card: #111122;
+    --bg-card-alt: #191932;
+    --border-color: #3b3b7a;
+    --text-primary: #ffffff;
+    --text-secondary: #9a9ab0;
+    --accent-glow: #00f0ff;
+    --theme-color-1: #00f0ff; /* Neon Cyan */
+    --theme-color-2: #ff007f; /* Hot Pink */
+    --theme-color-3: #b026ff; /* Neon Purple */
+}
+
+/* Theme 3: Matrix Terminal (Classic Phosphor Green) */
+body.theme-matrix {
+    --bg-main: #020402;
+    --bg-sidebar: #050805;
+    --bg-card: #080d08;
+    --bg-card-alt: #101910;
+    --border-color: #203a20;
+    --text-primary: #39ff14;
+    --text-secondary: #85b88a;
+    --accent-glow: #39ff14;
+    --theme-color-1: #39ff14; /* Phosphor Green */
+    --theme-color-2: #21a00a; /* Mid-Green */
+    --theme-color-3: #8aef82; /* Soft Green */
+}
+
+/* Theme 4: Classic Charcoal (Standard Clean DAW Tone) */
+body.theme-charcoal {
+    --bg-main: #18181c;
+    --bg-sidebar: #1e1e24;
+    --bg-card: #26262d;
+    --bg-card-alt: #2d2d37;
+    --border-color: #3d3d49;
+    --text-primary: #f0f0f5;
+    --text-secondary: #a0a0b0;
+    --accent-glow: #00a8e8;
+    --theme-color-1: #00a8e8; /* Muted Cyan */
+    --theme-color-2: #7d8491; /* Slate */
+    --theme-color-3: #b288ff; /* Soft Muted Violet */
+}
+
+/* Theme 5: Deep Obsidian (Pitch-Black Flat Profile) */
+body.theme-obsidian {
+    --bg-main: #000000;
+    --bg-sidebar: #080808;
+    --bg-card: #101010;
+    --bg-card-alt: #181818;
+    --border-color: #222222;
+    --text-primary: #ffffff;
+    --text-secondary: #777777;
+    --accent-glow: #9e9e9e;
+    --theme-color-1: #888888; /* Steel */
+    --theme-color-2: #555555; /* Dark Gray */
+    --theme-color-3: #aaaaaa; /* Light Gray */
+}
+
+/* Theme 6: Gothic Violet (Deep Plum & Haunted Gold) */
+body.theme-gothic {
+    --bg-main: #0a050d;
+    --bg-sidebar: #100816;
+    --bg-card: #180d22;
+    --bg-card-alt: #241433;
+    --border-color: #441f5e;
+    --text-primary: #dfc5fe;
+    --text-secondary: #9076ab;
+    --accent-glow: #d4af37;
+    --theme-color-1: #d4af37; /* Burnished Gold */
+    --theme-color-2: #a855f7; /* Muted Violet */
+    --theme-color-3: #e879f9; /* Soft Magenta */
+}
+
+/* Theme 7: Coldwave (Steely Ice Blue & White) */
+body.theme-coldwave {
+    --bg-main: #070c12;
+    --bg-sidebar: #0c151e;
+    --bg-card: #13202d;
+    --bg-card-alt: #1a2a3b;
+    --border-color: #274356;
+    --text-primary: #ffffff;
+    --text-secondary: #8ba2b5;
+    --accent-glow: #a5f3fc;
+    --theme-color-1: #06b6d4; /* Ice Blue */
+    --theme-color-2: #0891b2; /* Mid Ocean */
+    --theme-color-3: #e0f2fe; /* Frost White */
+}
+
+/* Theme 8: Amber Tape (Warm Lofi Gold) */
+body.theme-amber {
+    --bg-main: #0c0803;
+    --bg-sidebar: #140d05;
+    --bg-card: #1d140a;
+    --bg-card-alt: #291c10;
+    --border-color: #523820;
+    --text-primary: #ffb700;
+    --text-secondary: #c99c6b;
+    --accent-glow: #ffb700;
+    --theme-color-1: #ffb700; /* Warm Amber */
+    --theme-color-2: #f97316; /* Muted Rust Orange */
+    --theme-color-3: #fdba74; /* Warm Cream */
+}
+
+/* Theme 9: Cyberpunk (Neon Pink & Toxic Yellow) */
+body.theme-cyberpunk {
+    --bg-main: #050005;
+    --bg-sidebar: #0f000f;
+    --bg-card: #1c001c;
+    --bg-card-alt: #2a002a;
+    --border-color: #ff00ff;
+    --text-primary: #39ff14;
+    --text-secondary: #ff00ff;
+    --accent-glow: #ff00ff;
+    --theme-color-1: #ff00ff; /* Saturated Magenta Pink */
+    --theme-color-2: #39ff14; /* Toxic Acid Green */
+    --theme-color-3: #00f0ff; /* Electric Cyan */
+}
+
+/* Theme 10: Tokyo Midnight (Midnight Blue & Cherry Blossom) */
+body.theme-tokyo {
+    --bg-main: #03040a;
+    --bg-sidebar: #070914;
+    --bg-card: #0c1020;
+    --bg-card-alt: #121830;
+    --border-color: #1a2348;
+    --text-primary: #fca5a5;
+    --text-secondary: #787f9e;
+    --accent-glow: #fca5a5;
+    --theme-color-1: #fda4af; /* Soft Pink Blossom */
+    --theme-color-2: #3b82f6; /* Tokyo Neon Blue */
+    --theme-color-3: #70b0ff; /* Sky Accent */
+}
+
+/* Theme 11: Industrial (Brushed Steel & Warning Orange) */
+body.theme-industrial {
+    --bg-main: #141416;
+    --bg-sidebar: #1a1a1e;
+    --bg-card: #222227;
+    --bg-card-alt: #292930;
+    --border-color: #3b3b42;
+    --text-primary: #ff5500;
+    --text-secondary: #8c8c9e;
+    --accent-glow: #ff5500;
+    --theme-color-1: #ff5500; /* Industrial Orange */
+    --theme-color-2: #eab308; /* Hazard Yellow */
+    --theme-color-3: #a8a29e; /* Cold Iron Dust */
+}
+
+/* ==========================================================================
+   3. GENERAL STRUCTURAL ARCHITECTURE
+   ========================================================================== */
+body {
+    background-color: var(--bg-main);
+    color: var(--text-secondary);
+    line-height: 1.5;
+    font-size: var(--base-font-size);
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+    transition: background-color 0.15s, color 0.15s;
+}
+
+.zoom-control-checkbox {
+    display: none;
+}
+
+/* Master zoom engine scales layout dynamically */
+#zoom-toggle:checked ~ .app-container {
+    --base-font-size: 19px;
+    --title-font-size: 28px;
+    --h3-font-size: 19px;
+    --card-padding: 24px;
+}
+
+.app-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    font-size: var(--base-font-size);
+    transition: font-size 0.12s ease-in-out;
+}
+
+/* ==========================================================================
+   4. SIDEBAR & NAVIGATION
+   ========================================================================== */
+.sidebar {
+    width: 320px;
+    background-color: var(--bg-sidebar);
+    border-right: 2px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    padding: 15px;
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
+    transition: background-color 0.15s, border-color 0.15s;
+}
+
+.sidebar-header {
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--border-color);
+    text-align: center;
+}
+
+.sidebar-header h1 {
+    font-size: 14px;
+    font-weight: 900;
+    color: var(--theme-color-1);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-shadow: 0 0 12px var(--theme-color-1);
+}
+
+.sidebar-title {
+    font-size: 15px;
+    font-weight: 900;
+    color: var(--theme-color-1);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px var(--theme-color-1);
+    margin: 15px auto;
+    text-align: center;
+}
+
+.sidebar-nav {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.sidebar-nav ul {
+    list-style: none;
+}
+
+.sidebar-nav li {
+    margin-bottom: 8px;
+}
+
+.sidebar-nav a {
+    display: block;
+    padding: 10px 12px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 13px;
+    border-left: 3px solid transparent;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.sidebar-nav a:hover {
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    border-left-color: var(--theme-color-2);
+}
+
+/* ==========================================================================
+   5. LYRIC CANVAS ARCHITECTURE & CONTROLS
+   ========================================================================== */
+.canvas-container {
+    width: 100%;
+    background-color: #020205;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    position: relative;
+    height: 480px;
+    margin-bottom: 24px;
+    overflow: hidden;
+    box-shadow: inset 0 0 30px rgba(176, 38, 255, 0.05), 0 4px 20px rgba(0, 0, 0, 0.4);
+    transition: border-color 0.15s;
+}
+
+.canvas-grid-bg {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-size: 20px 20px;
+    background-image: linear-gradient(to right, rgba(157, 78, 221, 0.02) 1px, transparent 1px),
+                      linear-gradient(to bottom, rgba(157, 78, 221, 0.02) 1px, transparent 1px);
+    pointer-events: none;
+}
+
+.canvas-header {
+    background-color: rgba(11, 11, 20, 0.95);
+    border-bottom: 1px solid var(--border-color);
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    z-index: 10;
+}
+
+/* Dedicated full-width input row sitting statically below header controls */
+.canvas-input-row {
+    background-color: rgba(11, 11, 20, 0.95);
+    border-bottom: 1px solid var(--border-color);
+    padding: 10px 15px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    position: absolute;
+    top: 55px; left: 0; right: 0;
+    z-index: 10;
+}
+
+.canvas-input {
+    background-color: #05050a;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 8px 12px;
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    flex-grow: 1;
+    outline: none;
+}
+
+.canvas-input:focus {
+    border-color: var(--theme-color-1);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.15);
+}
+
+.canvas-btn {
+    background-color: var(--bg-card-alt);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 8px 14px;
+    color: var(--theme-color-1);
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.canvas-btn:hover {
+    border-color: var(--theme-color-1);
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+.canvas-board {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0; left: 0;
+    padding-top: 110px; /* Offset for both Header + Input row spacing */
+}
+
+/* ==========================================================================
+   6. ABSOLUTE POSITIONED MAGNET ELEMENTS
+   ========================================================================== */
+.magnet-card {
+    position: absolute;
+    background-color: var(--bg-card-alt);
+    border: 1px solid var(--theme-color-3);
+    padding: 6px 12px;
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: bold;
+    cursor: grab;
+    user-select: none;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5), 0 0 6px rgba(157, 78, 221, 0.1);
+    touch-action: none;
+    z-index: 100;
+    transition: border-color 0.1s, box-shadow 0.1s;
+}
+
+.magnet-card:active {
+    cursor: grabbing;
+    border-color: var(--theme-color-1);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.6), 0 0 12px var(--theme-color-1);
+    z-index: 1000;
+}
+
+.magnet-card.custom-word {
+    border-color: var(--theme-color-2);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5), 0 0 6px var(--theme-color-2);
+}
+
+/* ==========================================================================
+   7. DEDICATED SUGGESTIONS DRAWER (STATIC SEPARATED BLOCK)
+   ========================================================================== */
+.suggestions-drawer {
+    background-color: var(--bg-card);
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.suggestions-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    border-bottom: 1px dashed var(--border-color);
+    padding-bottom: 6px;
+}
+
+.suggestions-title {
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--theme-color-1);
+    font-family: var(--font-mono);
+}
+
+/* Dedicated 3-row structured suggestions list (tight badges, custom scroll) */
+.suggestions-list-flex {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    max-height: 90px; /* Constrains vertical rendering strictly to 3 rows of badges */
+    overflow-y: auto;
+    align-content: flex-start;
+    padding-right: 4px;
+}
+
+.suggestion-item {
+    background-color: var(--bg-card-alt);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 3px 6px; /* Tight compact sizing */
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: border-color 0.1s;
+}
+
+.suggestion-item:hover {
+    border-color: var(--theme-color-1);
+}
+
+/* ==========================================================================
+   8. CORE PANELS, REF TABLES & WORD BANKS
+   ========================================================================== */
+.main-content {
+    flex-grow: 1;
+    padding: 24px;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    display: flex;
+    flex-direction: column;
+}
+
+.section-container {
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto 40px auto;
+}
+
+.section-header {
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.section-header h2 {
+    font-size: var(--title-font-size);
+    font-weight: 800;
+    color: var(--theme-color-1);
+    text-shadow: 0 0 12px rgba(255, 255, 255, 0.05);
+    text-transform: uppercase;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.dashboard-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: var(--card-padding);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    transition: border-color 0.15s, padding 0.12s ease-in-out;
+}
+
+.dashboard-card:hover {
+    border-color: var(--theme-color-1);
+}
+
+.dashboard-card h3 {
+    font-size: var(--h3-font-size);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    border-bottom: 1px dashed var(--border-color);
+    padding-bottom: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.details-wrapper {
+    margin-bottom: 24px;
+}
+
+details {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: border-color 0.15s;
+}
+
+summary {
+    padding: 14px 18px;
+    font-weight: 700;
+    cursor: pointer;
+    outline: none;
+    user-select: none;
+    font-size: 14px;
+    color: var(--text-primary);
+    background-color: var(--bg-card-alt);
+    border-left: 3px solid transparent;
+    transition: background 0.15s, border-left-color 0.15s;
+}
+
+summary:hover {
+    background-color: var(--bg-card);
+    border-left-color: var(--theme-color-1);
+}
+
+details[open] summary {
+    border-bottom: 1px solid var(--border-color);
+    border-left-color: var(--theme-color-2);
+}
+
+.details-body {
+    padding: 20px;
+}
+
+/* Word Pools grid */
+.word-grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 8px;
+}
+
+.word-badge {
+    background-color: var(--bg-card-alt);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 13px;
+    text-align: center;
+    font-family: var(--font-mono);
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.word-badge:hover {
+    border-color: var(--theme-color-2);
+    color: var(--theme-color-2);
+    background-color: rgba(255, 255, 255, 0.01);
+    box-shadow: 0 0 8px var(--theme-color-2);
+}
+
+/* Scannable tables styling */
+.table-wrapper {
+    background-color: var(--bg-card);
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+th {
+    background-color: var(--bg-card-alt);
+    color: var(--text-primary);
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    padding: 12px 16px;
+    border-bottom: 2px solid var(--border-color);
+    letter-spacing: 0.5px;
+}
+
+td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    font-size: 14px;
+    vertical-align: top;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.01);
+}
+
+/* ==========================================================================
+   9. COMPLEMENTARY SYSTEMS
+   ========================================================================== */
+.callout {
+    background-color: rgba(255, 255, 255, 0.01);
+    border-left: 3px solid var(--theme-color-1);
+    border-radius: 0 6px 6px 0;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.callout-title {
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+    color: var(--theme-color-1);
+}
+
+.badge {
+    font-size: 10px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    border: 1px solid transparent;
+}
+
+.badge-primary { border-color: var(--theme-color-1); color: var(--theme-color-1); }
+.badge-secondary { border-color: var(--theme-color-2); color: var(--theme-color-2); }
+.badge-tertiary { border-color: var(--theme-color-3); color: var(--theme-color-3); }
+
+.highlight-primary { color: var(--theme-color-1); font-weight: 600; }
+.highlight-secondary { color: var(--theme-color-2); font-weight: 600; }
+.highlight-tertiary { color: var(--theme-color-3); font-weight: 600; }
+
+@media (max-width: 768px) {
+    body {
+        flex-direction: column;
+        overflow-y: auto;
+        height: auto;
+    }
+    .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 2px solid var(--border-color);
+    }
+    .main-content {
+        padding: 15px;
+        overflow-y: visible;
+    }
+}

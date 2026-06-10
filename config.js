@@ -18,8 +18,8 @@ const CONFIG = {
         { "id": "m_wheel_r", "label": "Wheel Right", "action": "Previous Pattern" },
         { "id": "m_thumb_1", "label": "G8 Button", "action": "Toggle metronome (Ctrl+M)" },
         { "id": "m_thumb_2", "label": "G7 Button", "action": "Save New Version (Ctrl+N)" },
-        { "id": "m_thumb_snipe", "label": "G9 Small Button", "action": "Stop sound (Ctrl+H)" },
-        { "id": "m_side_1", "label": "Thumb Large", "action": "Close All Windows (F12)" },
+        { "id": "m_thumb_snipe", "label": "G9 Small Button", "action": "Close All Windows (F12)" },
+        { "id": "m_side_1", "label": "Thumb Large", "action": "Control" },
         { "id": "m_side_2", "label": "Thumb Forward", "action": "REDO/QUICK UNDO (Ctrl+Alt+Z)" },
         { "id": "m_side_3", "label": "Thumb Back", "action": "UNDO (Ctrl+Z)" }
     ]

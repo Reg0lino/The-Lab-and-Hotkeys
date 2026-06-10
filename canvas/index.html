@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE LAB // CREATIVE SONGWRITING WORKSPACE</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-g910"> <!-- Default G910 Hotkey theme -->
+
+    <!-- ZERO-JS FONT SIZE TOGGLE -->
+    <input type="checkbox" id="zoom-toggle" class="zoom-control-checkbox">
+
+    <div class="app-container">
+        
+        <!-- SIDEBAR PANEL -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h1>THE LAB</h1>
+            </div>
+
+            <!-- DYNAMIC TITLE HEADER (ASCII REMOVED) -->
+            <div class="sidebar-title">THE COMPANION LAB</div>
+
+            <!-- SCALING CONTROL -->
+            <label for="zoom-toggle" class="zoom-label">🔍 Toggle Font Zoom</label>
+
+            <!-- THEME SELECTION DROPDOWN -->
+            <div style="margin-bottom: 20px;">
+                <label for="theme-select" style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--text-primary); display: block; margin-bottom: 6px;">
+                    Select Interface Theme
+                </label>
+                <select id="theme-select" class="canvas-input" style="width: 100%; height: 38px;">
+                    <option value="theme-g910" selected>1. G910 HUD (DAW Default)</option>
+                    <option value="theme-synthwave">2. Synthwave (Neon Purple)</option>
+                    <option value="theme-matrix">3. Matrix Terminal (Phosphor Green)</option>
+                    <option value="theme-charcoal">4. Classic Charcoal (Clean DAW)</option>
+                    <option value="theme-obsidian">5. Deep Obsidian (Flat Black)</option>
+                    <option value="theme-gothic">6. Gothic Violet (Plum &amp; Gold)</option>
+                    <option value="theme-coldwave">7. Coldwave (Ice Blue)</option>
+                    <option value="theme-amber">8. Amber Tape (Lofi Amber)</option>
+                    <option value="theme-cyberpunk">9. Cyberpunk (Toxic Magenta)</option>
+                    <option value="theme-tokyo">10. Tokyo Midnight (Cherry Blue)</option>
+                    <option value="theme-industrial">11. Industrial (Warning Orange)</option>
+                </select>
+            </div>
+
+            <!-- DRAFT ARCHIVE MANAGER -->
+            <div style="margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px;">
+                <label for="draft-select" style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--text-primary); display: block; margin-bottom: 6px;">
+                    Active Song Draft
+                </label>
+                <select id="draft-select" class="canvas-input" style="width: 100%; height: 38px; margin-bottom: 12px;"></select>
+                
+                <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                    <input type="text" id="new-draft-input" class="canvas-input" placeholder="New Sketch Name..." autocomplete="off">
+                    <button id="create-draft-btn" class="canvas-btn">New</button>
+                </div>
+                <button id="delete-draft-btn" class="canvas-btn" style="width: 100%; color: var(--theme-color-1); border-color: var(--border-color); background-color: transparent;">
+                    Delete Active Sketch
+                </button>
+            </div>
+
+            <!-- APP NAVIGATION LINKS -->
+            <div class="sidebar-nav">
+                <ul>
+                    <li><a href="../index.html">&lt;-- BACK TO HOTKEYS</a></li>
+                    <li><a href="#vocal-workspace">&gt;_ the canvas area</a></li>
+                    <li><a href="#saved-dictionary">&gt;_ saved custom bank</a></li>
+                    <li><a href="#lexicon-palette">&gt;_ visceral word pools</a></li>
+                    <li><a href="#reference-desk">&gt;_ reference desk</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- MAIN TERMINAL SCREEN -->
+        <main class="main-content">
+
+            <!-- SECTION 1: THE LYRIC CANVAS AREA -->
+            <section id="vocal-workspace" class="section-container">
+                <div class="section-header">
+                    <h2>&gt;_ THE WRITING CANVAS AREA</h2>
+                    <span id="save-status" style="font-size: 11px; color: var(--neon-green); text-transform: uppercase; font-family: var(--font-mono); display: none;">
+                        ✔ SAVED TO LOCALSTORAGE
+                    </span>
+                </div>
+
+                <div class="callout">
+                    <div class="callout-title">Interactive Workspace Guide</div>
+                    Click on any word in the pools below to spawn a card. Use the text box below to type custom cards. Drag cards out of the canvas box to delete them, or drop them directly on the **Saved Vocabulary Bank** below to save them.
+                </div>
+
+                <!-- PERSISTENT DRAG-AND-DROP CANVAS -->
+                <div class="canvas-container">
+                    <div class="canvas-grid-bg"></div>
+                    
+                    <div class="canvas-header">
+                        <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--theme-color-1); font-family: var(--font-mono);">
+                            Vocal Magnet Workspace
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button id="export-png-btn" class="canvas-btn" style="color: var(--theme-color-1); border-color: var(--border-color);">Snapshot PNG</button>
+                            <button id="copy-text-btn" class="canvas-btn" style="color: var(--neon-green); border-color: var(--border-color);">Copy Text</button>
+                            <button id="clear-board-btn" class="canvas-btn" style="color: var(--neon-orange); border-color: var(--border-color);">Clear Board</button>
+                        </div>
+                    </div>
+
+                    <!-- DEDICATED SPACIOUS INPUT ROW (UN-SQUISHED) -->
+                    <div class="canvas-input-row">
+                        <input type="text" id="custom-word-input" class="canvas-input" placeholder="Type custom word (Auto-suggests related words)..." autocomplete="off">
+                        <select id="api-mode-select" class="canvas-input" style="max-width: 150px; height: 35px; padding: 4px;">
+                            <option value="means_like" selected>Means-Like</option>
+                            <option value="perfect_rhyme">Perfect Rhyme</option>
+                            <option value="slant_rhyme">Near/Slant Rhyme</option>
+                            <option value="consonant_match">Alliteration</option>
+                            <option value="triggers">Triggers</option>
+                            <option value="adjectives_for">Adjectives</option>
+                            <option value="nouns_for">Nouns</option>
+                            <option value="synonyms">Synonyms</option>
+                            <option value="antonyms">Antonyms</option>
+                            <option value="sounds_like">Sounds-Like</option>
+                        </select>
+                        <button id="add-word-btn" class="canvas-btn">Add</button>
+                    </div>
+
+                    <!-- ACTIVE DRAG BOARD -->
+                    <div id="canvas-board" class="canvas-board"></div>
+                </div>
+
+                <!-- DEDICATED 3-ROW SCROLLABLE SUGGESTIONS DRAWER (OUTSIDE CANVAS - NON-OVERLAPPING) -->
+                <div id="suggestions-drawer" class="suggestions-drawer">
+                    <div class="suggestions-header">
+                        <span class="suggestions-title">Datamuse Related Word Suggestions:</span>
+                        <button id="save-all-suggestions-btn" class="canvas-btn" style="font-size: 10px; padding: 4px 8px; color: var(--neon-green); border-color: var(--neon-green);">Save All to Bank</button>
+                    </div>
+                    <div id="suggestions-list" class="suggestions-list-flex"></div>
+                </div>
+            </section>
+
+            <!-- SECTION 2: THE CUSTOM SAVED DICTIONARY BANK -->
+            <section id="saved-dictionary" class="section-container">
+                <div class="section-header">
+                    <h2>&gt;_ MY SAVED VOCABULARY BANK</h2>
+                    <button id="export-dictionary-txt-btn" class="canvas-btn" style="color: var(--neon-green); border-color: var(--border-color);">Export Dictionary as TXT</button>
+                </div>
+                <div class="callout" style="border-left-color: var(--neon-green); background-color: rgba(57, 255, 20, 0.01);">
+                    <div class="callout-title" style="color: var(--neon-green);">Saved Terms Directory</div>
+                    Your custom-spawned and saved suggestion words are collected here in a persistent browser cache [1]. Click any word badge below to drop it onto your canvas board, or <strong class="highlight-green">double-click</strong> a badge in this list to delete it from your dictionary permanently.
+                </div>
+                <div class="dashboard-card" style="min-height: 100px;">
+                    <div id="custom-user-dictionary-bank" class="word-grid-container"></div>
+                </div>
+            </section>
+
+            <!-- SECTION 3: MASSIVE VISCERAL WORD POOLS -->
+            <section id="lexicon-palette" class="section-container">
+                <div class="section-header">
+                    <h2>&gt;_ VISCERAL WORD POOLS MATRIX</h2>
+                    <span style="font-size: 11px; color: var(--theme-color-1);">Click words to drop onto canvas</span>
+                </div>
+
+                <div class="details-wrapper">
+                    <!-- VISCERAL VERBS -->
+                    <details open>
+                        <summary>1. Visceral Verbs (Actions, Rituals &amp; Breakdowns)</summary>
+                        <div class="details-body">
+                            <div class="word-grid-container" id="verbs-bank">
+                                <!-- Loaded dynamically from verbs.json -->
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- EVOCATIVE NOUNS -->
+                    <details open>
+                        <summary>2. Evocative Nouns (Chemistry, Details &amp; Settings)</summary>
+                        <div class="details-body">
+                            <div class="word-grid-container" id="nouns-bank">
+                                <!-- Loaded dynamically from nouns.json -->
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- TEXTURAL ADJECTIVES -->
+                    <details open>
+                        <summary>3. Textural Adjectives &amp; Spatial Oxymorons</summary>
+                        <div class="details-body">
+                            <div class="word-grid-container" id="adjectives-bank">
+                                <!-- Loaded dynamically from adjectives.json -->
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- METAPHOR-FRIENDLY ESOTERIC WORDS -->
+                    <details open>
+                        <summary>4. Metaphor-Friendly Esoteric Words (Theology &amp; Architecture)</summary>
+                        <div class="details-body">
+                            <div class="word-grid-container" id="esoteric-bank">
+                                <!-- Loaded dynamically from esoteric.json -->
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </section>
+
+            <!-- SECTION 4: THE SIMPLE RHYMING WORKSPACE -->
+            <section id="rhyme-tool" class="section-container">
+                <div class="section-header">
+                    <h2>&gt;_ SIMPLIFIED RHYMING TOOL</h2>
+                </div>
+                <div class="dashboard-card">
+                    <div style="display: flex; gap: 10px; margin-bottom: 12px; align-items: center;">
+                        <input type="text" id="rhyme-search-input" class="canvas-input" placeholder="Type word for rhymes (Perfect Rhymes API)..." autocomplete="off">
+                    </div>
+                    <div id="rhyme-suggestions-list" class="word-grid-container" style="min-height: 50px;">
+                        <span style="font-size:12px; font-style:italic; color:var(--text-secondary);">Type a word above to see real-time matches. Click on a rhyme to drop it onto your canvas.</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 5: THE REFERENCE DESK -->
+            <section id="reference-desk" class="section-container">
+                <div class="section-header">
+                    <h2>&gt;_ REF DESK &amp; CHORD PROGRESSIONS</h2>
+                </div>
+
+                <div class="dashboard-grid">
+                    <!-- DYNAMIC PROGRESSIONS DIRECTORY -->
+                    <div class="dashboard-card" style="grid-column: 1 / -1;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px dashed var(--border-color); padding-bottom: 6px;">
+                            <h3 style="margin-bottom: 0; border: none; padding: 0;">Progressions Reference Directory</h3>
+                            
+                            <select id="progression-dir-select" class="canvas-input" style="max-width: 250px; height: 32px; padding: 2px;">
+                                <option value="core_minor_major" selected>Core Minor &amp; Major Paths</option>
+                                <option value="shoegaze_fuzz_loops">Shoegaze Fuzz Loops</option>
+                                <option value="lofi_neo_soul">Lofi &amp; Neo-Soul</option>
+                            </select>
+                        </div>
+                        <div class="table-wrapper" style="margin-bottom: 0;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th style="width: 20%;">Progression Path</th>
+                                        <th style="width: 20%;">Formula (Transposable)</th>
+                                        <th style="width: 20%;">A Minor / C Major Scale</th>
+                                        <th style="width: 40%;">Aesthetic Composition Vibe</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="progressions-table-body">
+                                    <!-- Dynamic rows loaded by reference.js -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- DYNAMIC TUNINGS & TRANSCRIBED TAB COUPLERS [1] -->
+                    <div class="dashboard-card" style="grid-column: 1 / -1;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px dashed var(--border-color); padding-bottom: 6px;">
+                            <h3 style="margin-bottom: 0; border: none; padding: 0;">Guitar Tunings &amp; Transcribed Tabs</h3>
+                            
+                            <div style="display: flex; gap: 10px;">
+                                <!-- Chromatic scale dropdown [1] -->
+                                <select id="chord-root-select" class="canvas-input" style="max-width: 120px; height: 32px; padding: 2px;">
+                                    <option value="C">Key: C</option>
+                                    <option value="C#">Key: C# / Db</option>
+                                    <option value="D">Key: D</option>
+                                    <option value="D#">Key: D# / Eb</option>
+                                    <option value="E">Key: E</option>
+                                    <option value="F">Key: F</option>
+                                    <option value="F#">Key: F# / Gb</option>
+                                    <option value="G">Key: G</option>
+                                    <option value="G#">Key: G# / Ab</option>
+                                    <option value="A" selected>Key: A</option>
+                                    <option value="A#">Key: A# / Bb</option>
+                                    <option value="B">Key: B</option>
+                                </select>
+                                
+                                <!-- Tuning block group dropdown [1] -->
+                                <select id="chord-tuning-select" class="canvas-input" style="max-width: 250px; height: 32px; padding: 2px;">
+                                    <option value="group1">1. Drop C &amp; D Standard</option>
+                                    <option value="group2" selected>2. Drop D &amp; E Standard</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="table-wrapper" style="margin-bottom: 0;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th style="width: 30%;">Chord Extension Name</th>
+                                        <th style="width: 35%; color: var(--theme-color-2);">Dropped Configuration Fretboard Shape</th>
+                                        <th style="width: 35%; color: var(--theme-color-1);">Standard-Interval Fretboard Shape</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="chord-tabs-table-body">
+                                    <!-- Dynamic fret lists generated via JSON fetch -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- METER & PACING -->
+                    <div class="dashboard-card">
+                        <h3>
+                            <span>Vocal Meter &amp; Pacing Guidelines</span>
+                            <span class="badge badge-cyan">Syllables</span>
+                        </h3>
+                        <div class="fret-guide-row">
+                            <span class="highlight-cyan">Trochaic Stress (Heavy-Light)</span>
+                            <span>"FRAC-ture / CLYN-ic"</span>
+                        </div>
+                        <div class="fret-guide-row">
+                            <span class="highlight-cyan">Dactylic Sweep (Heavy-L-L)</span>
+                            <span>"PUR-i-fy / SIL-i-con"</span>
+                        </div>
+                        <div class="fret-guide-row">
+                            <span class="highlight-cyan">Iambic Stress (Light-Heavy)</span>
+                            <span>"the DRIFT / the FIX"</span>
+                        </div>
+                        <p style="font-size: 12px; color: var(--text-secondary); margin-top: 10px; font-style: italic;">Use syllable configurations to match pacing with the tempo of alternative drum loops.</p>
+                    </div>
+
+                    <!-- SHOW VS TELL COMPARISON EXPANSION -->
+                    <div class="dashboard-card">
+                        <h3>
+                            <span>Show, Don't Tell Sensory Table</span>
+                            <span class="badge badge-pink">Sensory</span>
+                        </h3>
+                        <div class="fret-guide-row">
+                            <span class="highlight-pink">"I am losing my mind."</span>
+                            <span style="font-size: 12px; font-style: italic;">"The radiator hums in 3/4 time."</span>
+                        </div>
+                        <div class="fret-guide-row">
+                            <span class="highlight-pink">"We don't talk anymore."</span>
+                            <span style="font-size: 12px; font-style: italic;">"Your keys are on the counter."</span>
+                        </div>
+                        <div class="fret-guide-row">
+                            <span class="highlight-pink">"I feel empty inside."</span>
+                            <span style="font-size: 12px; font-style: italic;">"Flakes of drywall on the floor."</span>
+                        </div>
+                        <p style="font-size: 12px; color: var(--text-secondary); margin-top: 10px; font-style: italic;">Transform abstract emotions into physical proxies.</p>
+                    </div>
+                </div>
+
+                <!-- SHOW VS TELL COMPARISON EXPANSION -->
+                <details>
+                    <summary>Show, Don't Tell Sensory Translation Table</summary>
+                    <div class="details-body">
+                        <div class="table-wrapper" style="margin-bottom: 0;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Abstract Sentiment (Telling)</th>
+                                        <th>Concrete Physical Proxy (Showing)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="highlight-pink">"I am so anxious and scared."</td>
+                                        <td style="color: var(--text-primary); font-weight: bold;">"The thumb tearing the edge of a damp matchbook cover."</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="highlight-pink">"Our relationship was built on a lie."</td>
+                                        <td style="color: var(--text-primary); font-weight: bold;">"We built a sanctuary out of wet plaster and cardboard."</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="highlight-pink">"The memory of us still hurts."</td>
+                                        <td style="color: var(--text-primary); font-weight: bold;">"Fluorescent glare on wet asphalt at 4 AM."</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="highlight-pink">"I miss you and need your touch."</td>
+                                        <td style="color: var(--text-primary); font-weight: bold;">"Hold onto my throat, breathe into me."</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </details>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- MOUNT APPLICATION LOGIC AND REFERENCE LIBRARIES -->
+    <script src="drag.js"></script>
+    <script src="placement.js"></script>
+    <script src="storage.js"></script>
+    <script src="api.js"></script>
+    <script src="reference.js"></script>
+    <script src="app.js"></script> <!-- The unified central controller -->
+</body>
+</html>

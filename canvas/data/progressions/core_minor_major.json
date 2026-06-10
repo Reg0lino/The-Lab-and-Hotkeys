@@ -1,0 +1,38 @@
+[
+  {
+    "name": "The Epic Walk-Up",
+    "formula": "i - VI - VII - i",
+    "keys": "Am - F - C - Am",
+    "vibe": "Driving, massive, melancholic alternative rock backbone."
+  },
+  {
+    "name": "The Bleak Modal Loop",
+    "formula": "i - i - v - iv",
+    "keys": "Am - Am - Em - Dm",
+    "vibe": "Bleak, cold, and hypnotic; strips out classical major resolutions."
+  },
+  {
+    "name": "The Brooding Valley",
+    "formula": "i - bVI - iv - bVI",
+    "keys": "Am - F - Dm - F",
+    "vibe": "Brooding, slow, and moody; ideal for sustained, dragging verses."
+  },
+  {
+    "name": "The Ethereal Shimmer",
+    "formula": "I - IV - vi - V",
+    "keys": "A - D - F#m - E",
+    "vibe": "Bittersweet, nostalgic shoegaze or dream-pop lift."
+  },
+  {
+    "name": "The Cinematic Rise",
+    "formula": "i - iv - v - III",
+    "keys": "Am - Dm - Em - C",
+    "vibe": "Step from dark valley paths into a vast major key clearing."
+  },
+  {
+    "name": "The Tension Wave",
+    "formula": "i - V - bIII - iv - V",
+    "keys": "Am - E - C - Dm - E",
+    "vibe": "Utilizes a major V chord for extreme chromatic tension."
+  }
+]

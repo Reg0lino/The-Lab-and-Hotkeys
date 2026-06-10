@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Saturated 6/9 Shimmer",
+    "formula": "I(6/9) - IV(6/9) - vi9 - V6",
+    "keys": "C6/9 - F6/9 - Am9 - G6",
+    "vibe": "Massive fuzz wash. Extensions generate beautiful, dreamy ambient shoegaze spaces."
+  },
+  {
+    "name": "The Cascading Descent",
+    "formula": "i - III - v/VII - VI",
+    "keys": "Cm - Eb - Gm/Bb - Ab",
+    "vibe": "Midwest Emo/Math Rock. Smooth voice-leading with open top strings ringing."
+  },
+  {
+    "name": "The Sinking Valley",
+    "formula": "iv - i - bVI - bIII",
+    "keys": "Em - Bm - G - D",
+    "vibe": "Slowcore drag. Sinking feel ideal for slow-tempo low-end weight."
+  }
+]

@@ -1,0 +1,434 @@
+/**
+ * THE LAB // app.js
+ * Central Orchestration, DOM Event Bindings, and Exporter Controller
+ */
+
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. DOM Element Cache
+    const board = document.getElementById('canvas-board');
+    const themeSelect = document.getElementById('theme-select');
+    const draftSelect = document.getElementById('draft-select');
+    const newDraftInput = document.getElementById('new-draft-input');
+    const createDraftBtn = document.getElementById('create-draft-btn');
+    const deleteDraftBtn = document.getElementById('delete-draft-btn');
+    const customWordInput = document.getElementById('custom-word-input');
+    const apiModeSelect = document.getElementById('api-mode-select');
+    const addWordBtn = document.getElementById('add-word-btn');
+    const copyTextBtn = document.getElementById('copy-text-btn');
+    const clearBoardBtn = document.getElementById('clear-board-btn');
+    const exportPngBtn = document.getElementById('export-png-btn');
+    const exportDictTxtBtn = document.getElementById('export-dictionary-txt-btn');
+    
+    // API Suggestions Elements
+    const suggestionsDrawer = document.getElementById('suggestions-drawer');
+    const suggestionsList = document.getElementById('suggestions-list');
+    const saveAllSuggestionsBtn = document.getElementById('save-all-suggestions-btn');
+    
+    // Chord & Progression Reference Elements
+    const chordRootSelect = document.getElementById('chord-root-select');
+    const chordTuningSelect = document.getElementById('chord-tuning-select');
+    const chordTabsTableBody = document.getElementById('chord-tabs-table-body');
+    const progressionDirSelect = document.getElementById('progression-dir-select');
+    const progressionsTableBody = document.getElementById('progressions-table-body');
+    
+    // Rhyme Tool Elements
+    const rhymeSearchInput = document.getElementById('rhyme-search-input');
+    const rhymeSuggestionsList = document.getElementById('rhyme-suggestions-list');
+
+    let rhymeDebounceTimer = null;
+
+    // ==========================================================================
+    // 2. THEME PERSISTENCE CONFIGURATION
+    // ==========================================================================
+    const savedTheme = localStorage.getItem('the_lab_active_theme') || 'theme-g910';
+    document.body.className = savedTheme;
+    themeSelect.value = savedTheme;
+    
+    themeSelect.addEventListener('change', () => {
+        document.body.className = themeSelect.value;
+        localStorage.setItem('the_lab_active_theme', themeSelect.value);
+    });
+
+    // ==========================================================================
+    // 3. GLOBAL SPAWNER EXPOSITION
+    // ==========================================================================
+    window.spawnCardElement = function(text, isCustom, left, top) {
+        if (!board) return null;
+        
+        const card = document.createElement('div');
+        card.className = 'magnet-card' + (isCustom ? ' custom-word' : '');
+        card.textContent = text;
+        card.style.left = left + 'px';
+        card.style.top = top + 'px';
+        
+        // Double-click to delete card securely
+        card.addEventListener('dblclick', () => {
+            card.remove();
+            if (typeof StorageEngine !== 'undefined') StorageEngine.saveActiveDraft();
+        });
+
+        board.appendChild(card);
+        return card;
+    };
+
+    // ==========================================================================
+    // 4. ENGINE INITIALIZATION
+    // ==========================================================================
+    if (typeof DragEngine !== 'undefined') DragEngine.init(board);
+    if (typeof StorageEngine !== 'undefined') StorageEngine.init(draftSelect, board);
+    if (typeof ReferenceEngine !== 'undefined') ReferenceEngine.init(progressionDirSelect, progressionsTableBody);
+    if (typeof APIEngine !== 'undefined') APIEngine.init(customWordInput, apiModeSelect, suggestionsDrawer, suggestionsList, saveAllSuggestionsBtn);
+
+    // ==========================================================================
+    // 5. CHORD TRANSPOSER ENGINE (Aligned to read flat JSON keys) [1]
+    // ==========================================================================
+    const loadTranscribedChords = () => {
+        if (!chordRootSelect || !chordTuningSelect || !chordTabsTableBody) return;
+
+        const root = chordRootSelect.value;
+        const group = chordTuningSelect.value;
+        
+        const fileMap = {
+            'C': 'key_c', 'C#': 'key_c_sharp', 'D': 'key_d', 'D#': 'key_d_sharp',
+            'E': 'key_e', 'F': 'key_f', 'F#': 'key_f_sharp', 'G': 'key_g',
+            'G#': 'key_g_sharp', 'A': 'key_a', 'A#': 'key_a_sharp', 'B': 'key_b'
+        };
+        
+        const fileName = fileMap[root] || 'key_a';
+        const url = `data/chords/${fileName}.json`;
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) throw new Error('Data file missing');
+                return response.json();
+            })
+            .then(data => {
+                chordTabsTableBody.innerHTML = '';
+                data.chords.forEach(c => {
+                    let standardTab = [];
+                    let dropTab = [];
+                    
+                    // Aligned: Directly references flat JSON keys from your files [1]
+                    if (group === 'group1') {
+                        standardTab = c.dstandard;
+                        dropTab = c.dropc;
+                    } else {
+                        standardTab = c.estandard;
+                        dropTab = c.dropd;
+                    }
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td style="font-weight:700; color:var(--text-primary);">${c.name}</td>
+                        <td class="highlight-pink" style="font-family:var(--font-mono); font-weight:bold;">${dropTab.join('-')}</td>
+                        <td class="highlight-cyan" style="font-family:var(--font-mono);">${standardTab.join('-')}</td>
+                    `;
+                    chordTabsTableBody.appendChild(row);
+                });
+            })
+            .catch(err => {
+                console.warn("Could not fetch relative chord JSON: ", err);
+                chordTabsTableBody.innerHTML = '<tr><td colspan="3" style="text-align:center; font-style:italic; color:var(--neon-orange);">Offline: Please make sure canvas/data/chords/ folder contains correct JSON files.</td></tr>';
+            });
+    };
+
+    chordRootSelect.addEventListener('change', loadTranscribedChords);
+    chordTuningSelect.addEventListener('change', loadTranscribedChords);
+    loadTranscribedChords(); // Initial run
+
+    // ==========================================================================
+    // 6. DYNAMIC OFFLINE WORD POOL LOADER [1]
+    // ==========================================================================
+    const loadWordPool = (poolId, containerId) => {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        const url = `data/word_pools/${poolId}.json`;
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) throw new Error();
+                return response.json();
+            })
+            .then(words => {
+                container.innerHTML = '';
+                words.forEach(word => {
+                    const badge = document.createElement('div');
+                    badge.className = 'word-badge';
+                    badge.textContent = word;
+
+                    // Clicking the static word badge spawns it on the canvas board
+                    badge.addEventListener('click', () => {
+                        if (typeof window.spawnCardElement === 'function' && typeof PlacementEngine !== 'undefined') {
+                            const coords = PlacementEngine.findOpenPosition(word, board);
+                            window.spawnCardElement(word, false, coords.left, coords.top);
+                            StorageEngine.saveActiveDraft();
+                        }
+                    });
+
+                    container.appendChild(badge);
+                });
+            })
+            .catch(() => {
+                container.innerHTML = '<span style="font-size:12px; font-style:italic; color:var(--neon-orange);">Offline: Please make sure data/word_pools/ directory contains files.</span>';
+            });
+    };
+
+    // Load static offline word files automatically on load [1]
+    loadWordPool('verbs', 'verbs-bank');
+    loadWordPool('nouns', 'nouns-bank');
+    loadWordPool('adjectives', 'adjectives-bank');
+    loadWordPool('esoteric', 'esoteric-bank');
+
+    // ==========================================================================
+    // 7. MULTI-DRAFT UI BINDINGS
+    // ==========================================================================
+    createDraftBtn.addEventListener('click', () => {
+        const name = newDraftInput.value.trim();
+        if (!name) return;
+        StorageEngine.createDraft(name);
+        newDraftInput.value = '';
+    });
+
+    newDraftInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            const name = newDraftInput.value.trim();
+            if (!name) return;
+            StorageEngine.createDraft(name);
+            newDraftInput.value = '';
+        }
+    });
+
+    deleteDraftBtn.addEventListener('click', () => {
+        const activeId = StorageEngine.activeProjectId;
+        const project = StorageEngine.projects.find(p => p.id === activeId);
+        if (!project) return;
+        
+        if (confirm(`Confirm deletion of the draft: "${project.name}"? This action cannot be undone.`)) {
+            StorageEngine.deleteProject(activeId);
+        }
+    });
+
+    draftSelect.addEventListener('change', () => {
+        StorageEngine.switchProject(draftSelect.value);
+    });
+
+    // ==========================================================================
+    // 8. CUSTOM WORD SPAWNER BINDINGS
+    // ==========================================================================
+    const triggerCustomWordSpawn = () => {
+        const text = customWordInput.value.trim();
+        if (!text) return;
+        
+        const coords = PlacementEngine.findOpenPosition(text, board);
+        window.spawnCardElement(text, true, coords.left, coords.top);
+        
+        customWordInput.value = '';
+        APIEngine.hideSuggestions();
+        StorageEngine.saveActiveDraft();
+    };
+
+    addWordBtn.addEventListener('click', triggerCustomWordSpawn);
+    customWordInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') triggerCustomWordSpawn();
+    });
+
+    // ==========================================================================
+    // 9. SIMPLIFIED RHYMING TOOL [1]
+    // ==========================================================================
+    rhymeSearchInput.addEventListener('input', () => {
+        clearTimeout(rhymeDebounceTimer);
+        const val = rhymeSearchInput.value.trim();
+
+        if (val.length < 2) {
+            rhymeSuggestionsList.innerHTML = '<span style="font-size:12px; font-style:italic; color:var(--text-secondary);">Type a word above to see real-time matches. Click on a rhyme to drop it onto your canvas.</span>';
+            return;
+        }
+
+        // Debounce threshold set to 500ms to protect endpoints [1]
+        rhymeDebounceTimer = setTimeout(() => {
+            rhymeSuggestionsList.innerHTML = '<span style="font-size:12px; font-style:italic; color:var(--text-secondary);">Querying Datamuse Rhyme database...</span>';
+            
+            const url = `https://api.datamuse.com/words?rel_rhy=${encodeURIComponent(val)}&max=20`;
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) throw new Error('API server returned error');
+                    return response.json();
+                })
+                .then(data => {
+                    rhymeSuggestionsList.innerHTML = '';
+                    if (!data || data.length === 0) {
+                        rhymeSuggestionsList.innerHTML = '<span style="font-size:12px; font-style:italic;">No perfect rhymes found.</span>';
+                        return;
+                    }
+                    data.forEach(item => {
+                        const badge = document.createElement('div');
+                        badge.className = 'word-badge';
+                        badge.textContent = item.word;
+
+                        badge.addEventListener('click', () => {
+                            const coords = PlacementEngine.findOpenPosition(item.word, board);
+                            window.spawnCardElement(item.word, false, coords.left, coords.top);
+                            StorageEngine.saveActiveDraft();
+                        });
+
+                        rhymeSuggestionsList.appendChild(badge);
+                    });
+                })
+                .catch(err => {
+                    console.warn("Connection offline or Rhyme API failed: ", err);
+                    rhymeSuggestionsList.innerHTML = '<span style="font-size:12px; font-style:italic; color:var(--neon-orange);">Offline: Rhyming API unavailable.</span>';
+                });
+        }, 500);
+    });
+
+    // ==========================================================================
+    // 10. CANVAS SYSTEM UTILITIES (COPY TEXT & CLEAR BOARD)
+    // ==========================================================================
+    copyTextBtn.addEventListener('click', () => {
+        const cards = Array.from(board.querySelectorAll('.magnet-card'));
+        if (cards.length === 0) return;
+
+        // Sort cards logically: reading-order (row segments)
+        cards.sort((a, b) => {
+            const topA = parseFloat(a.style.top);
+            const topB = parseFloat(b.style.top);
+            const leftA = parseFloat(a.style.left);
+            const leftB = parseFloat(b.style.left);
+
+            if (Math.abs(topA - topB) < 15) {
+                return leftA - leftB;
+            }
+            return topA - topB;
+        });
+
+        let words = [];
+        let currentTop = parseFloat(cards[0].style.top);
+        let currentLine = [];
+
+        cards.forEach(card => {
+            const t = parseFloat(card.style.top);
+            if (Math.abs(t - currentTop) >= 15) {
+                words.push(currentLine.join(' '));
+                currentLine = [];
+                currentTop = t;
+            }
+            currentLine.push(card.textContent);
+        });
+        if (currentLine.length > 0) {
+            words.push(currentLine.join(' '));
+        }
+
+        const exportedText = words.join('\n');
+        navigator.clipboard.writeText(exportedText).then(() => {
+            alert("Copied canvas lyrics to clipboard:\n\n" + exportedText);
+        }).catch(err => {
+            console.error("Failed to copy clipboard data: ", err);
+        });
+    });
+
+    clearBoardBtn.addEventListener('click', () => {
+        if (confirm("Clear all active word cards from the canvas?")) {
+            board.innerHTML = '';
+            StorageEngine.saveActiveDraft();
+        }
+    });
+
+    exportDictTxtBtn.addEventListener('click', () => {
+        StorageEngine.exportDictionaryAsTXT();
+    });
+
+    // ==========================================================================
+    // 11. THEME-AWARE DYNAMIC PNG SNAPSHOT ENGINE
+    // ==========================================================================
+    exportPngBtn.addEventListener('click', () => {
+        const cards = Array.from(board.querySelectorAll('.magnet-card'));
+        if (cards.length === 0) {
+            alert("The board is empty. Spawn some words first before exporting.");
+            return;
+        }
+
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Match canvas sizes to DOM container sizing
+        const width = board.offsetWidth || 800;
+        const height = board.offsetHeight || 480;
+        canvas.width = width;
+        canvas.height = height;
+
+        // Fetch real-time active system CSS parameters
+        const bodyStyle = getComputedStyle(document.body);
+        const bgMain = bodyStyle.getPropertyValue('--bg-main').trim() || '#040409';
+        const cardAlt = bodyStyle.getPropertyValue('--bg-card-alt').trim() || '#161633';
+        const textPrimary = bodyStyle.getPropertyValue('--text-primary').trim() || '#ffffff';
+        const theme1 = bodyStyle.getPropertyValue('--theme-color-1').trim() || '#ffb700';
+        const theme2 = bodyStyle.getPropertyValue('--theme-color-2').trim() || '#ff7a00';
+        const theme3 = bodyStyle.getPropertyValue('--theme-color-3').trim() || '#2b2b3d';
+
+        // Paint Background
+        ctx.fillStyle = bgMain;
+        ctx.fillRect(0, 0, width, height);
+
+        // Paint Faint Grid
+        ctx.strokeStyle = 'rgba(157, 78, 221, 0.05)';
+        ctx.lineWidth = 1;
+        const gridSize = 20;
+        for (let x = 0; x < width; x += gridSize) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, height);
+            ctx.stroke();
+        }
+        for (let y = 0; y < height; y += gridSize) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(width, y);
+            ctx.stroke();
+        }
+
+        // Render each card onto vector plane
+        cards.forEach(card => {
+            const cardX = parseFloat(card.style.left) || 0;
+            const cardY = parseFloat(card.style.top) || 0;
+            const cardW = card.offsetWidth;
+            const cardH = card.offsetHeight;
+            const isCustom = card.classList.contains('custom-word');
+
+            // Set card colors
+            const borderStroke = isCustom ? theme2 : theme3;
+
+            // Draw card background
+            ctx.fillStyle = cardAlt;
+            ctx.beginPath();
+            ctx.roundRect(cardX, cardY, cardW, cardH, 4); // Standard 4px radius
+            ctx.fill();
+
+            // Draw border line
+            ctx.strokeStyle = borderStroke;
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            // Render Monospace font matching system
+            ctx.fillStyle = textPrimary;
+            ctx.font = 'bold 13px Consolas, Courier New, monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(card.textContent, cardX + (cardW / 2), cardY + (cardH / 2) + 1);
+        });
+
+        // Generate Data URI and trigger automatic download
+        const activeProject = StorageEngine.projects.find(p => p.id === StorageEngine.activeProjectId);
+        const rawName = activeProject ? activeProject.name : 'sketch';
+        const safeName = rawName.toLowerCase().replace(/[^a-z0-9]/g, '_');
+
+        const dataUrl = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = `the_lab_${safeName}_snapshot.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+});

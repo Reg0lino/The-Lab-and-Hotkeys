@@ -216,3 +216,27 @@ kbd { background-color: #2a2a2a; border: 1px solid #555; border-radius: 3px; box
 .key.active-ctrl rect { stroke: var(--logi-blue); fill: #002233 !important; }
 .key.active-shift rect { stroke: #ff5555; fill: #330000 !important; }
 .key.active-alt rect { stroke: #55ff55; fill: #003300 !important; }
+
+/* BRIDGE NAV TO THE LAB */
+#btn-goto-lab {
+    display: inline-block;
+    background: #111;
+    color: #ffd700; /* Logitech Gold Yellow to match your hotkey accents */
+    border: 1px solid #333;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: inherit;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, box-shadow 0.2s, color 0.2s;
+    margin-left: 10px;
+}
+
+#btn-goto-lab:hover {
+    background: #1a1a1a;
+    border-color: #ffd700;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+    color: #ffffff;
+}
