@@ -53,8 +53,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Master memory array for the dynamic randomizer [1]
     window.masterVocabularyPool = [];
-    // HOVER TO USE F10 DELETE HOTKEY
+    // HOVER TO USE NUMMINUS for DELETE HOTKEY
     window.hoveredCard = null; // Add this line to track hover states [1]
+    window.hoveredDictBadge = null; // Track dictionary badges for deletion [1]
 
     // ==========================================================================
     // 2. IN-WINDOW PROMISE MODAL OVERLAYS (RESOLVES BROWSER POPUPS RISK) [1]
@@ -628,6 +629,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     StorageEngine.renderCustomDictionaryBank();
                     window.updateClearButtonState();
                 }
+        } else if (window.hoveredDictBadge) {
+            // Allow Delete key to work on hovered item if nothing is selected
+            const word = window.hoveredDictBadge.querySelector('.word-badge').textContent.trim().toLowerCase();
+            const confirmed = await window.customConfirm("Remove Word", `Remove "${word}" from your saved dictionary?`);
+            if (confirmed) {
+                StorageEngine.customDictionary = StorageEngine.customDictionary.filter(w => w !== word);
+                localStorage.setItem(StorageEngine.customDictionaryKey, JSON.stringify(StorageEngine.customDictionary));
+                StorageEngine.renderCustomDictionaryBank();
+            }
             }
         }
     });

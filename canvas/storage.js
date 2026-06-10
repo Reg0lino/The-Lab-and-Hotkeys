@@ -230,11 +230,16 @@ const StorageEngine = {
             badgeContainer.className = 'custom-badge-container';
             badgeContainer.style.position = 'relative';
             badgeContainer.style.display = 'inline-block';
+            badgeContainer.style.zIndex = '1';
 
             const badge = document.createElement('div');
             badge.className = 'word-badge';
             badge.textContent = word;
             badge.style.borderColor = 'var(--neon-green)';
+
+            // Hover tracking for hotkey deletions
+            badgeContainer.addEventListener('mouseenter', () => window.hoveredDictBadge = badgeContainer);
+            badgeContainer.addEventListener('mouseleave', () => { if(window.hoveredDictBadge === badgeContainer) window.hoveredDictBadge = null; });
 
             // Clicking the custom word spawns it on the canvas
             badge.addEventListener('click', (e) => {
@@ -267,6 +272,7 @@ const StorageEngine = {
             // Re-written: uses window.customConfirm to prevent browser alerts [1]
             deleteIcon.addEventListener('click', async (e) => {
                 e.stopPropagation(); // Stop card from spawning on board
+            console.log('Delete icon clicked for word:', word); // ADD THIS LINE
                 const confirmed = await window.customConfirm("Remove Word", `Are you sure you want to remove "${word}" from your saved custom dictionary?`);
                 if (confirmed) {
                     this.customDictionary = this.customDictionary.filter(w => w !== word);
