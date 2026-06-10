@@ -1,6 +1,6 @@
 /**
  * THE LAB // app.js
- * Central Orchestration, DOM Event Bindings, and Exporter Controller
+ * Central Orchestration, DOM Event Bindings, and Exporter Controller (With Middle-Click Delete & Single Select)
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -53,6 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Master memory array for the dynamic randomizer [1]
     window.masterVocabularyPool = [];
+    // HOVER TO USE F10 DELETE HOTKEY
+    window.hoveredCard = null; // Add this line to track hover states [1]
 
     // ==========================================================================
     // 2. IN-WINDOW PROMISE MODAL OVERLAYS (RESOLVES BROWSER POPUPS RISK) [1]
@@ -159,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadDynamicThemesList();
 
     // ==========================================================================
-    // 4. GLOBAL SPAWNER EXPOSITION (WITH CARD-HOVER SAVE BINDINGS) [1]
+    // 4. GLOBAL SPAWNER EXPOSITION (WITH ADVANCED INPUT CONTROLS) [1]
     // ==========================================================================
     window.spawnCardElement = function(text, isCustom, left, top) {
         if (!board) return null;
@@ -195,20 +197,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
         card.appendChild(savePlus);
 
-        // Double-click to delete card securely
-        card.addEventListener('dblclick', async () => {
-            // Check if card belongs to active selection, and delete selection [1]
-            if (card.classList.contains('selected')) {
-                const selectedCards = Array.from(board.querySelectorAll('.magnet-card.selected'));
-                const confirmed = await window.customConfirm("Delete Selection", `Delete all ${selectedCards.length} selected cards from the canvas?`);
-                if (confirmed) {
-                    selectedCards.forEach(c => c.remove());
-                    window.updateClearButtonState();
-                    StorageEngine.saveActiveDraft();
-                }
-            } else {
-                card.remove();
-                if (typeof StorageEngine !== 'undefined') StorageEngine.saveActiveDraft();
+        // Double-click: Isolates and selects ONLY this card [1]
+        card.addEventListener('dblclick', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            
+            // Deselect all other active cards
+            const allCards = board.querySelectorAll('.magnet-card');
+            allCards.forEach(c => c.classList.remove('selected'));
+            
+            // Highlight only this card
+            card.classList.add('selected');
+            
+            window.updateClearButtonState();
+            if (typeof StorageEngine !== 'undefined') StorageEngine.saveActiveDraft();
+        });
+
+        // Hover tracking: Sets window.hoveredCard dynamically on mouseenter/mouseleave [1]
+        card.addEventListener('mouseenter', () => {
+            window.hoveredCard = card;
+        });
+
+        card.addEventListener('mouseleave', () => {
+            if (window.hoveredCard === card) {
+                window.hoveredCard = null;
             }
         });
 
@@ -253,7 +265,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     let standardTab = [];
                     let dropTab = [];
                     
-                    // Aligned: Directly references flat JSON keys from your files [1]
                     if (group === 'group1') {
                         standardTab = c.dstandard;
                         dropTab = c.dropc;
@@ -273,7 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .catch(err => {
                 console.warn("Could not fetch relative chord JSON: ", err);
-                chordTabsTableBody.innerHTML = '<tr><td colspan="3" style="text-align:center; font-style:italic; color:var(--neon-orange);">Offline: Please make sure canvas/data/chords/ folder contains correct JSON files.</td></tr>';
+                chordTabsTableBody.innerHTML = '<tr><td colspan="3" style="text-align:center; font-style:italic; color:var(--neon-orange);">Offline: Please make sure data/chords/ folder contains correct JSON files.</td></tr>';
             });
     };
 
@@ -439,7 +450,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-// Interactive 🎲 Random Word Spawner (Triggers live API fetch with active mode) [1]
+    // Interactive 🎲 Random Word Spawner (Triggers live API fetch with active mode) [1]
     if (randomWordBtn) {
         randomWordBtn.addEventListener('click', () => {
             const hasPool = window.masterVocabularyPool && window.masterVocabularyPool.length > 0;
@@ -497,22 +508,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Custom Dedicated Delete Selection on Board Click Handler [1]
+    // Custom Dedicated Delete Selection on Board Click Handler (Resolved: Immediate deletion) [1]
     if (deleteSelectedBoardBtn) {
-        deleteSelectedBoardBtn.addEventListener('click', async () => {
+        deleteSelectedBoardBtn.addEventListener('click', () => {
             const selectedCards = Array.from(board.querySelectorAll('.magnet-card.selected'));
             if (selectedCards.length === 0) return;
 
-            const confirmed = await window.customConfirm("Delete Selection", `Delete all ${selectedCards.length} selected cards from the canvas?`);
-            if (confirmed) {
-                selectedCards.forEach(c => c.remove());
-                window.updateClearButtonState();
-                StorageEngine.saveActiveDraft();
-            }
+            // Resolved: Canvas board selection deletions are now instant with zero popups [1]
+            selectedCards.forEach(c => c.remove());
+            window.updateClearButtonState();
+            StorageEngine.saveActiveDraft();
         });
     }
 
-    // Custom Dedicated Delete Selected from Dictionary Bank Click Handler [1]
+    // Custom Dedicated Delete Selected from Dictionary Bank Click Handler (Resolved: Keeps modal warnings) [1]
     if (deleteSelectedDictBtn) {
         deleteSelectedDictBtn.addEventListener('click', async () => {
             const selectedBadges = Array.from(document.querySelectorAll('.custom-badge-container.selected-badge'));
@@ -558,34 +567,59 @@ document.addEventListener('DOMContentLoaded', () => {
         const isZ = e.key.toLowerCase() === 'z';
         const isY = e.key.toLowerCase() === 'y';
         const isDelete = e.key === 'Delete' || e.key === 'Del';
+        const isNumpadMinus = e.code === 'NumpadSubtract'; // Numpad - key [1]
 
         // 1. UNDO: Triggers on Ctrl+Z OR Ctrl+Alt+Z [1]
         if (isZ && e.ctrlKey) {
             e.preventDefault();
-            if (typeof StorageEngine !== 'undefined') StorageEngine.executeUndo();
+            if (typeof StorageEngine !== 'undefined') {
+                StorageEngine.executeUndo();
+            }
         }
 
         // 2. REDO: Triggers on Ctrl+Y [1]
         if (isY && e.ctrlKey && !e.altKey) {
             e.preventDefault();
-            if (typeof StorageEngine !== 'undefined') StorageEngine.executeRedo();
+            if (typeof StorageEngine !== 'undefined') {
+                StorageEngine.executeRedo();
+            }
         }
 
-        // 3. DELETE SELECTIONS: Triggers on Delete/Del with native confirmations [1]
+        // 3. NUMPAD MINUS INSTANT HOVER VAPORIZATION [1]
+        if (isNumpadMinus) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (window.hoveredCard) {
+                if (window.hoveredCard.classList.contains('selected')) {
+                    // Delete all currently highlighted cards immediately [1]
+                    const selectedCards = Array.from(board.querySelectorAll('.magnet-card.selected'));
+                    selectedCards.forEach(c => c.remove());
+                } else {
+                    // Delete only this targeted card immediately [1]
+                    window.hoveredCard.remove();
+                }
+                
+                window.hoveredCard = null;
+                window.updateClearButtonState();
+                if (typeof StorageEngine !== 'undefined') StorageEngine.saveActiveDraft();
+            }
+        }
+
+        // 4. DELETE SELECTIONS: Keyboard triggers [1]
         if (isDelete) {
             const selectedCards = Array.from(board.querySelectorAll('.magnet-card.selected'));
             const selectedBadges = Array.from(document.querySelectorAll('.custom-badge-container.selected-badge'));
 
             if (selectedCards.length > 0) {
                 e.preventDefault();
-                const confirmed = await window.customConfirm("Delete Selection", `Delete all ${selectedCards.length} selected cards from the canvas?`);
-                if (confirmed) {
-                    selectedCards.forEach(c => c.remove());
-                    window.updateClearButtonState();
-                    StorageEngine.saveActiveDraft();
-                }
+                // Resolved: Canvas board keyboard deletions are now instant with zero popups [1]
+                selectedCards.forEach(c => c.remove());
+                window.updateClearButtonState();
+                StorageEngine.saveActiveDraft();
             } else if (selectedBadges.length > 0) {
                 e.preventDefault();
+                // Resolved: Saved dictionary deletions strictly retain modal warning popups [1]
                 const confirmed = await window.customConfirm("Delete Saved Words", `Permanently delete all ${selectedBadges.length} selected words from your custom saved dictionary?`);
                 if (confirmed) {
                     const wordsToRemove = selectedBadges.map(el => el.querySelector('.word-badge').textContent.trim().toLowerCase());
