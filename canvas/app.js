@@ -366,11 +366,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // 9. CUSTOM & BULK WORD SPAWNER BINDINGS [1]
     // ==========================================================================
     const triggerCustomWordSpawn = () => {
-        const text = customWordInput.value.trim();
-        if (!text) return;
+        const rawText = customWordInput.value.trim();
+        if (!rawText) return;
         
-        const coords = PlacementEngine.findOpenPosition(text, board);
-        window.spawnCardElement(text, true, coords.left, coords.top);
+        // 1. Isolate question marks by padding them with spaces [1]
+        let processed = rawText.replace(/\?/g, ' ? ');
+        
+        // 2. Strip out all other forbidden punctuation (preserving only letters, numbers, spaces, apostrophes, question marks, and hyphens) [1]
+        processed = processed.replace(/[^\w\s'?-]/g, '');
+        
+        // 3. Split the sanitized sentence into an array of separate words [1]
+        const words = processed.trim().split(/\s+/);
+        
+        // 4. Sequentially calculate coordinate positions and spawn cards [1]
+        words.forEach(word => {
+            const coords = PlacementEngine.findOpenPosition(word, board);
+            window.spawnCardElement(word, true, coords.left, coords.top);
+        });
         
         customWordInput.value = '';
         APIEngine.hideSuggestions();
