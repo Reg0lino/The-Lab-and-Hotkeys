@@ -2,79 +2,63 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>FL Studio G910 Hotkeys</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE STUDIO TERMINAL // COMPANION SYSTEM</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body>
 
-<div id="header">
-    <div class="logo">G910 x FL STUDIO <span id="mode-badge">MASTER</span></div>
-    <div class="controls">
-        Context: 
-        <select id="context-select">
-            <option value="Master" selected>Master List (All)</option>
-            <option value="Global">Global / General</option>
-            <option value="Playlist">Playlist</option>
-            <option value="Piano Roll">Piano Roll</option>
-            <option value="Mixer">Mixer</option>
-            <option value="Channel Rack">Channel Rack</option>
-            <option value="Browser">Browser</option>
-        </select>
-    </div>
-    <div id="modifiers">
-        <span class="mod-indicator" id="mod-ctrl">CTRL</span>
-        <span class="mod-indicator" id="mod-shift">SHIFT</span>
-        <span class="mod-indicator" id="mod-alt">ALT</span>
-    </div>
-    <button id="toggle-mouse">🖱️ Custom Mouse Macros</button>
-    <a href="canvas/index.html" id="btn-goto-lab">🧪 Open The Lab</a>
-</div>
-
-<div id="main-container">
-    <div class="keyboard-area">
-        <svg id="g910-svg" viewBox="-20 -48 1550 450"></svg> <!-- Adjusted viewBox to accommodate G-keys by increasing the y offset -->
+    <div class="terminal-wrapper">
         
-        <!-- NEW: Dynamic Mouse Matrix -->
-        <div id="mouse-matrix">
-            <div class="matrix-btn" id="mm-left"><span class="mm-icon">🖱️ L</span> <span class="mm-text">Standard Click</span></div>
-            <div class="matrix-btn" id="mm-right"><span class="mm-icon">🖱️ R</span> <span class="mm-text">Context / Tool</span></div>
-            <div class="matrix-btn" id="mm-mid"><span class="mm-icon">🖱️ M</span> <span class="mm-text">Pan</span></div>
-            <div class="matrix-btn" id="mm-wheel"><span class="mm-icon">↕️ W</span> <span class="mm-text">Scroll</span></div>
-        </div>
+        <!-- HEADER LOGO BANNER -->
+        <header class="terminal-header">
+            <div class="terminal-logo">
+                SYS.TERMINAL // <span class="logo-accent">ONLINE</span>
+            </div>
+            <div class="terminal-status">
+                UTC: 2026-06-10 | TARGET: ACTIVE_STUDIO
+            </div>
+        </header>
 
-        <div id="hud">
-            <div id="hud-title">[ STANDBY ]</div>
-            <div id="hud-desc">Hover over keys, list items, or click CTRL/ALT/SHIFT above to see shortcuts.</div>
-            <div id="hud-details" style="color: #00ccff; font-size: 12px; font-style: italic; margin-top: 5px;"></div>
-        </div>
+        <!-- PORTAL INTERFACE GRID -->
+        <main class="portal-grid">
+            
+            <!-- PORTAL CARD A: HOTKEYS TRAINER -->
+            <a href="hotkeys/index.html" class="portal-card">
+                <div class="card-glow-border"></div>
+                <div class="card-content">
+                    <div class="card-icon">🎛️</div>
+                    <div class="card-sys-id">SYS.TACTILE</div>
+                    <h2 class="card-title">G910 Hotkey Trainer</h2>
+                    <p class="card-desc">
+                        Interactive physical muscle-memory simulator and mouse map. Master FL Studio keyboard shortcuts, G-Keys, and custom G502 macros to eliminate workspace friction.
+                    </p>
+                    <div class="card-footer">LAUNCH SYSTEM ➔</div>
+                </div>
+            </a>
 
-        <div id="learning-zone" style="margin-top: auto; width: 100%; max-width: 900px; border: 1px dashed #333; padding: 20px; border-radius: 10px; text-align: center; color: #444;">
-            <h3 style="margin: 0; letter-spacing: 3px;">LEARNING MODE PANEL</h3>
-            <p style="font-size: 12px;">(Future home of Flashcard Training)</p>
-        </div>
+            <!-- PORTAL CARD B: THE LYRIC LAB -->
+            <a href="canvas/index.html" class="portal-card">
+                <div class="card-glow-border"></div>
+                <div class="card-content">
+                    <div class="card-icon">🧪</div>
+                    <div class="card-sys-id">SYS.TOPLINE</div>
+                    <h2 class="card-title">The Songwriting Lab</h2>
+                    <p class="card-desc">
+                        Dynamic lyric canvas, modular visceral word pools, and transposing guitar chord directories. Design vocal pacing meters and compile persistent custom dictionaries.
+                    </p>
+                    <div class="card-footer" style="color: var(--logi-blue); border-color: var(--logi-blue);">ACCESS LABORATORY ➔</div>
+                </div>
+            </a>
+
+        </main>
+
+        <!-- FOOTER DETAILS -->
+        <footer class="terminal-footer">
+            [ SECURE LOCALHOST // NO BG PROCESSES // ZERO DAW LATENCY ]
+        </footer>
     </div>
-    
-    <div class="reference-panel">
-        <div class="search-box">
-            <input type="text" id="search-input" placeholder="Search FL Hotkeys...">
-        </div>
-        <div id="reference-list"></div>
-    </div>
-</div>
 
-<div id="mouse-drawer">
-    <div class="drawer-header">G502 Custom Macros <button id="close-mouse">✕</button></div>
-    <div id="mouse-list"></div>
-</div>
-
-<div id="tooltip" class="hidden">
-    <div id="tt-title"></div>
-    <div id="tt-desc"></div>
-</div>
-
-<script src="config.js"></script>
-<script src="data.js"></script>
-<script src="app.js"></script>
 </body>
 </html>

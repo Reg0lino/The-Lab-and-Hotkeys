@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FL Studio G910 Hotkeys</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body>
+
+<div id="header">
+    <div class="logo">G910 x FL STUDIO <span id="mode-badge">MASTER</span></div>
+    <div class="controls">
+        Context: 
+        <select id="context-select">
+            <option value="Master" selected>Master List (All)</option>
+            <option value="Global">Global / General</option>
+            <option value="Playlist">Playlist</option>
+            <option value="Piano Roll">Piano Roll</option>
+            <option value="Mixer">Mixer</option>
+            <option value="Channel Rack">Channel Rack</option>
+            <option value="Browser">Browser</option>
+        </select>
+    </div>
+    <div id="modifiers">
+        <span class="mod-indicator" id="mod-ctrl">CTRL</span>
+        <span class="mod-indicator" id="mod-shift">SHIFT</span>
+        <span class="mod-indicator" id="mod-alt">ALT</span>
+    </div>
+    <button id="toggle-mouse">🖱️ Custom Mouse Macros</button>
+    <a href="canvas/index.html" id="btn-goto-lab">🧪 Open The Lab</a>
+</div>
+
+<div id="main-container">
+    <div class="keyboard-area">
+        <svg id="g910-svg" viewBox="-20 -48 1550 450"></svg> <!-- Adjusted viewBox to accommodate G-keys by increasing the y offset -->
+        
+        <!-- NEW: Dynamic Mouse Matrix -->
+        <div id="mouse-matrix">
+            <div class="matrix-btn" id="mm-left"><span class="mm-icon">🖱️ L</span> <span class="mm-text">Standard Click</span></div>
+            <div class="matrix-btn" id="mm-right"><span class="mm-icon">🖱️ R</span> <span class="mm-text">Context / Tool</span></div>
+            <div class="matrix-btn" id="mm-mid"><span class="mm-icon">🖱️ M</span> <span class="mm-text">Pan</span></div>
+            <div class="matrix-btn" id="mm-wheel"><span class="mm-icon">↕️ W</span> <span class="mm-text">Scroll</span></div>
+        </div>
+
+        <div id="hud">
+            <div id="hud-title">[ STANDBY ]</div>
+            <div id="hud-desc">Hover over keys, list items, or click CTRL/ALT/SHIFT above to see shortcuts.</div>
+            <div id="hud-details" style="color: #00ccff; font-size: 12px; font-style: italic; margin-top: 5px;"></div>
+        </div>
+
+        <div id="learning-zone" style="margin-top: auto; width: 100%; max-width: 900px; border: 1px dashed #333; padding: 20px; border-radius: 10px; text-align: center; color: #444;">
+            <h3 style="margin: 0; letter-spacing: 3px;">LEARNING MODE PANEL</h3>
+            <p style="font-size: 12px;">(Future home of Flashcard Training)</p>
+        </div>
+    </div>
+    
+    <div class="reference-panel">
+        <div class="search-box">
+            <input type="text" id="search-input" placeholder="Search FL Hotkeys...">
+        </div>
+        <div id="reference-list"></div>
+    </div>
+</div>
+
+<div id="mouse-drawer">
+    <div class="drawer-header">G502 Custom Macros <button id="close-mouse">✕</button></div>
+    <div id="mouse-list"></div>
+</div>
+
+<div id="tooltip" class="hidden">
+    <div id="tt-title"></div>
+    <div id="tt-desc"></div>
+</div>
+
+<script src="config.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
