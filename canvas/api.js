@@ -6,7 +6,7 @@
 const APIEngine = {
     debounceTimer: null,
     debounceDelay: 500, // Wait 500ms after typing stops [1]
-    maxSuggestions: 40,  // Keep suggestions exactly at 40 words [1]
+    maxSuggestions: 100,  // Increased from 40 to 100 for a larger results pool [1]
     
     inputElement: null,
     modeSelectElement: null,
