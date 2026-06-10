@@ -272,7 +272,6 @@ const StorageEngine = {
             // Re-written: uses window.customConfirm to prevent browser alerts [1]
             deleteIcon.addEventListener('click', async (e) => {
                 e.stopPropagation(); // Stop card from spawning on board
-            console.log('Delete icon clicked for word:', word); // ADD THIS LINE
                 const confirmed = await window.customConfirm("Remove Word", `Are you sure you want to remove "${word}" from your saved custom dictionary?`);
                 if (confirmed) {
                     this.customDictionary = this.customDictionary.filter(w => w !== word);
