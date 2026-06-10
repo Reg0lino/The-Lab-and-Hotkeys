@@ -21,6 +21,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const clearDictBtn = document.getElementById('clear-dictionary-btn');
     const saveBoardBtn = document.getElementById('save-board-btn');
     
+    // Undo / Redo / Select elements [1]
+    const undoBtn = document.getElementById('undo-btn');
+    const redoBtn = document.getElementById('redo-btn');
+    const selectAllBtn = document.getElementById('select-all-btn');
+    const deselectAllBtn = document.getElementById('deselect-all-btn');
+    
+    // Dedicated Multi-Delete Buttons [1]
+    const deleteSelectedBoardBtn = document.getElementById('delete-selected-board-btn');
+    const deleteSelectedDictBtn = document.getElementById('delete-selected-dict-btn');
+    
     // API Suggestions Elements
     const suggestionsDrawer = document.getElementById('suggestions-drawer');
     const suggestionsList = document.getElementById('suggestions-list');
@@ -60,6 +70,9 @@ document.addEventListener('DOMContentLoaded', () => {
             cancelBtn.style.display = 'none'; // Hide cancel button for simple alerts
             overlay.style.display = 'flex';
 
+            // Auto-focus the Confirm button for instant Enter confirmation [1]
+            confirmBtn.focus();
+
             const onConfirm = () => {
                 overlay.style.display = 'none';
                 confirmBtn.removeEventListener('click', onConfirm);
@@ -82,6 +95,9 @@ document.addEventListener('DOMContentLoaded', () => {
             bodyEl.textContent = message;
             cancelBtn.style.display = 'inline-block'; // Show cancel button for confirmations
             overlay.style.display = 'flex';
+
+            // Auto-focus the Confirm button for instant Enter confirmation [1]
+            confirmBtn.focus();
 
             const cleanup = (result) => {
                 overlay.style.display = 'none';
@@ -134,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .catch(err => {
                 console.warn("Themes configuration file missing offline. Loading hardcoded default. ", err);
-                themeSelect.innerHTML = '<option value="theme-g910" selected>1. Dark and Yellow (Page Default)</option>';
+                themeSelect.innerHTML = '<option value="theme-g910" selected>1. G910 HUD (DAW Default)</option>';
                 document.body.className = 'theme-g910';
             });
     };
@@ -180,9 +196,20 @@ document.addEventListener('DOMContentLoaded', () => {
         card.appendChild(savePlus);
 
         // Double-click to delete card securely
-        card.addEventListener('dblclick', () => {
-            card.remove();
-            if (typeof StorageEngine !== 'undefined') StorageEngine.saveActiveDraft();
+        card.addEventListener('dblclick', async () => {
+            // Check if card belongs to active selection, and delete selection [1]
+            if (card.classList.contains('selected')) {
+                const selectedCards = Array.from(board.querySelectorAll('.magnet-card.selected'));
+                const confirmed = await window.customConfirm("Delete Selection", `Delete all ${selectedCards.length} selected cards from the canvas?`);
+                if (confirmed) {
+                    selectedCards.forEach(c => c.remove());
+                    window.updateClearButtonState();
+                    StorageEngine.saveActiveDraft();
+                }
+            } else {
+                card.remove();
+                if (typeof StorageEngine !== 'undefined') StorageEngine.saveActiveDraft();
+            }
         });
 
         board.appendChild(card);
@@ -246,13 +273,13 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .catch(err => {
                 console.warn("Could not fetch relative chord JSON: ", err);
-                chordTabsTableBody.innerHTML = '<tr><td colspan="3" style="text-align:center; font-style:italic; color:var(--neon-orange);">Offline: Please make sure data/chords/ folder contains correct JSON files.</td></tr>';
+                chordTabsTableBody.innerHTML = '<tr><td colspan="3" style="text-align:center; font-style:italic; color:var(--neon-orange);">Offline: Please make sure canvas/data/chords/ folder contains correct JSON files.</td></tr>';
             });
     };
 
     chordRootSelect.addEventListener('change', loadTranscribedChords);
     chordTuningSelect.addEventListener('change', loadTranscribedChords);
-    loadTranscribedChords();
+    loadTranscribedChords(); // Initial run
 
     // ==========================================================================
     // 7. DYNAMIC OFFLINE WORD POOL LOADER [1]
@@ -400,15 +427,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Integrated: Dynamic 🎲 Random Word Spawner (Triggers live API fetch with active mode) [1]
+// Interactive 🎲 Random Word Spawner (Triggers live API fetch with active mode) [1]
     if (randomWordBtn) {
         randomWordBtn.addEventListener('click', () => {
-            if (!window.masterVocabularyPool || window.masterVocabularyPool.length === 0) {
+            const hasPool = window.masterVocabularyPool && window.masterVocabularyPool.length > 0;
+
+            if (!hasPool) {
                 window.customAlert("System Offline", "The local vocabulary pools have not loaded. Make sure canvas/data/word_pools/ directory is fully populated.");
                 return;
             }
 
-            // Pick a random word from the dynamically aggregated offline database [1]
+            // Pick a random word from the dynamically aggregated master vocabulary pool [1]
             const randomWord = window.masterVocabularyPool[Math.floor(Math.random() * window.masterVocabularyPool.length)];
 
             // Inject the rolled word into the search input field [1]
@@ -422,7 +451,143 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================================================
-    // 10. CANVAS SYSTEM UTILITIES (COPY TEXT, CLEAR BOARD, CLEAR DICTIONARY, SAVE BOARD) [1]
+    // 10. MULTI-SELECTION CONTROL BUTTONS [1]
+    // ==========================================================================
+    window.updateClearButtonState = function() {
+        const selectedBoardCount = board.querySelectorAll('.magnet-card.selected').length;
+        const selectedDictCount = document.querySelectorAll('.custom-badge-container.selected-badge').length;
+        
+        // Selection board controls [1]
+        if (deselectAllBtn) deselectAllBtn.disabled = selectedBoardCount === 0;
+        if (deleteSelectedBoardBtn) deleteSelectedBoardBtn.disabled = selectedBoardCount === 0;
+
+        // Selection dictionary controls [1]
+        if (deleteSelectedDictBtn) deleteSelectedDictBtn.disabled = selectedDictCount === 0;
+    };
+
+    if (selectAllBtn) {
+        selectAllBtn.addEventListener('click', () => {
+            const cards = board.querySelectorAll('.magnet-card');
+            if (cards.length === 0) return;
+            
+            cards.forEach(c => c.classList.add('selected'));
+            window.updateClearButtonState();
+            StorageEngine.saveActiveDraft();
+        });
+    }
+
+    if (deselectAllBtn) {
+        deselectAllBtn.addEventListener('click', () => {
+            const selected = board.querySelectorAll('.magnet-card.selected');
+            selected.forEach(c => c.classList.remove('selected'));
+            window.updateClearButtonState();
+            StorageEngine.saveActiveDraft();
+        });
+    }
+
+    // Custom Dedicated Delete Selection on Board Click Handler [1]
+    if (deleteSelectedBoardBtn) {
+        deleteSelectedBoardBtn.addEventListener('click', async () => {
+            const selectedCards = Array.from(board.querySelectorAll('.magnet-card.selected'));
+            if (selectedCards.length === 0) return;
+
+            const confirmed = await window.customConfirm("Delete Selection", `Delete all ${selectedCards.length} selected cards from the canvas?`);
+            if (confirmed) {
+                selectedCards.forEach(c => c.remove());
+                window.updateClearButtonState();
+                StorageEngine.saveActiveDraft();
+            }
+        });
+    }
+
+    // Custom Dedicated Delete Selected from Dictionary Bank Click Handler [1]
+    if (deleteSelectedDictBtn) {
+        deleteSelectedDictBtn.addEventListener('click', async () => {
+            const selectedBadges = Array.from(document.querySelectorAll('.custom-badge-container.selected-badge'));
+            if (selectedBadges.length === 0) return;
+
+            const confirmed = await window.customConfirm("Delete Saved Words", `Permanently delete all ${selectedBadges.length} selected words from your custom saved dictionary?`);
+            if (confirmed) {
+                const wordsToRemove = selectedBadges.map(el => el.querySelector('.word-badge').textContent.trim().toLowerCase());
+                
+                // Filter out from active dictionary memory bank [1]
+                StorageEngine.customDictionary = StorageEngine.customDictionary.filter(w => !wordsToRemove.includes(w));
+                
+                // Save and repaint
+                localStorage.setItem(StorageEngine.customDictionaryKey, JSON.stringify(StorageEngine.customDictionary));
+                StorageEngine.renderCustomDictionaryBank();
+                window.updateClearButtonState();
+            }
+        });
+    }
+
+    // ==========================================================================
+    // 11. UNDO / REDO HISTORY CLICK ACTIONS [1]
+    // ==========================================================================
+    if (undoBtn) {
+        undoBtn.addEventListener('click', () => {
+            if (typeof StorageEngine !== 'undefined') StorageEngine.executeUndo();
+        });
+    }
+
+    if (redoBtn) {
+        redoBtn.addEventListener('click', () => {
+            if (typeof StorageEngine !== 'undefined') StorageEngine.executeRedo();
+        });
+    }
+
+    // Hardware Keyboard listeners for Undo/Redo & Deletions [1]
+    document.addEventListener('keydown', async (e) => {
+        // Ignore hotkeys if user is currently typing inside active fields
+        if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'SELECT') {
+            return;
+        }
+
+        const isZ = e.key.toLowerCase() === 'z';
+        const isY = e.key.toLowerCase() === 'y';
+        const isDelete = e.key === 'Delete' || e.key === 'Del';
+
+        // 1. UNDO: Triggers on Ctrl+Z OR Ctrl+Alt+Z [1]
+        if (isZ && e.ctrlKey) {
+            e.preventDefault();
+            if (typeof StorageEngine !== 'undefined') StorageEngine.executeUndo();
+        }
+
+        // 2. REDO: Triggers on Ctrl+Y [1]
+        if (isY && e.ctrlKey && !e.altKey) {
+            e.preventDefault();
+            if (typeof StorageEngine !== 'undefined') StorageEngine.executeRedo();
+        }
+
+        // 3. DELETE SELECTIONS: Triggers on Delete/Del with native confirmations [1]
+        if (isDelete) {
+            const selectedCards = Array.from(board.querySelectorAll('.magnet-card.selected'));
+            const selectedBadges = Array.from(document.querySelectorAll('.custom-badge-container.selected-badge'));
+
+            if (selectedCards.length > 0) {
+                e.preventDefault();
+                const confirmed = await window.customConfirm("Delete Selection", `Delete all ${selectedCards.length} selected cards from the canvas?`);
+                if (confirmed) {
+                    selectedCards.forEach(c => c.remove());
+                    window.updateClearButtonState();
+                    StorageEngine.saveActiveDraft();
+                }
+            } else if (selectedBadges.length > 0) {
+                e.preventDefault();
+                const confirmed = await window.customConfirm("Delete Saved Words", `Permanently delete all ${selectedBadges.length} selected words from your custom saved dictionary?`);
+                if (confirmed) {
+                    const wordsToRemove = selectedBadges.map(el => el.querySelector('.word-badge').textContent.trim().toLowerCase());
+                    StorageEngine.customDictionary = StorageEngine.customDictionary.filter(w => !wordsToRemove.includes(w));
+                    localStorage.setItem(StorageEngine.customDictionaryKey, JSON.stringify(StorageEngine.customDictionary));
+                    StorageEngine.renderCustomDictionaryBank();
+                    window.updateClearButtonState();
+                }
+            }
+        }
+    });
+
+    // ==========================================================================
+    // 12. CANVAS SYSTEM UTILITIES (COPY TEXT, CLEAR BOARD, CLEAR DICTIONARY, SAVE BOARD) [1]
     // ==========================================================================
     copyTextBtn.addEventListener('click', () => {
         const cards = Array.from(board.querySelectorAll('.magnet-card'));
@@ -466,6 +631,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     clearBoardBtn.addEventListener('click', async () => {
+        // Aligned: "Clear Board" strictly clears whole board. Custom button handles selections [1]
         const confirmed = await window.customConfirm("Clear Board", "Are you sure you want to clear all active word cards from your canvas?");
         if (confirmed) {
             board.innerHTML = '';
@@ -502,7 +668,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================================================
-    // 12. THEME-AWARE DYNAMIC PNG SNAPSHOT ENGINE
+    // 13. THEME-AWARE DYNAMIC PNG SNAPSHOT ENGINE
     // ==========================================================================
     exportPngBtn.addEventListener('click', () => {
         const cards = Array.from(board.querySelectorAll('.magnet-card'));

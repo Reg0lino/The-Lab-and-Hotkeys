@@ -6,12 +6,10 @@
     <title>THE LAB // CREATIVE SONGWRITING WORKSPACE</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="themes.css">
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <!-- Preserved Favicon relative path pointing to root [1] -->
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
 </head>
 <body class="theme-g910"> <!-- Default G910 Hotkey theme -->
-
-
-
 
     <div class="app-container">
         
@@ -23,7 +21,6 @@
 
             <!-- DYNAMIC TITLE HEADER -->
             <div class="sidebar-title">THE COMPANION LAB</div>
-
 
             <!-- THEME SELECTION DROPDOWN -->
             <div style="margin-bottom: 20px;">
@@ -54,8 +51,7 @@
             <!-- APP NAVIGATION LINKS -->
             <div class="sidebar-nav">
                 <ul>
-                    <li><a href="../hotkeys/index.html">&lt;-- BACK TO HOTKEYS</a></li>
-                    <li><a href="../index.html">&lt;-- BACK TO HOME PORTAL</a></li>
+                    <li><a href="../index.html">&lt;-- BACK TO HOTKEYS</a></li>
                     <li><a href="#vocal-workspace">&gt;_ the canvas area</a></li>
                     <li><a href="#saved-dictionary">&gt;_ saved custom bank</a></li>
                     <li><a href="#lexicon-palette">&gt;_ visceral word pools</a></li>
@@ -78,7 +74,7 @@
 
                 <div class="callout">
                     <div class="callout-title">Interactive Workspace Guide</div>
-                    Click on any word in the pools below to spawn a card. Use the text box below to type custom cards. Drag cards out of the canvas box to delete them, or drop them directly on the **Saved Vocabulary Bank** below to save them.
+                    Click on any word in the pools below to spawn a card. Use the text box below to type custom cards. Drag cards out of the canvas box to delete them, or drop them directly on the **Saved Vocabulary Bank** below to save them [1]. Hold <strong class="highlight-primary">Ctrl + Click</strong> to select multiple words to drag or delete together [1].
                 </div>
 
                 <!-- PERSISTENT DRAG-AND-DROP CANVAS -->
@@ -90,7 +86,13 @@
                             Vocal Magnet Workspace
                         </div>
                         <div style="display: flex; gap: 10px;">
-                            <!-- Integrated: Save Board button [1] -->
+                            <!-- Integrated: Undo and Redo control buttons [1] -->
+                            <button id="undo-btn" class="canvas-btn" title="Step Back (Ctrl+Z / Ctrl+Alt+Z)" style="color: var(--theme-color-1); border-color: var(--border-color);" disabled>⬎ Undo</button>
+                            <button id="redo-btn" class="canvas-btn" title="Step Forward (Ctrl+Y)" style="color: var(--theme-color-1); border-color: var(--border-color);" disabled>⬈ Redo</button>
+                            <!-- Integrated: Select, Deselect, and Delete Selection board controls [1] -->
+                            <button id="select-all-btn" class="canvas-btn" style="color: var(--neon-green); border-color: var(--border-color);">Select All</button>
+                            <button id="deselect-all-btn" class="canvas-btn" style="color: var(--text-secondary); border-color: var(--border-color);" disabled>Deselect All</button>
+                            <button id="delete-selected-board-btn" class="canvas-btn" style="color: var(--neon-orange); border-color: var(--border-color);" disabled>Delete Selection</button> <!-- Added Board Delete Selection button [1] -->
                             <button id="save-board-btn" class="canvas-btn" style="color: var(--theme-color-1); border-color: var(--border-color);">Save Board</button>
                             <button id="export-png-btn" class="canvas-btn" style="color: var(--theme-color-1); border-color: var(--border-color);">Snapshot PNG</button>
                             <button id="copy-text-btn" class="canvas-btn" style="color: var(--neon-green); border-color: var(--border-color);">Copy Text</button>
@@ -143,12 +145,14 @@
                     <h2>&gt;_ MY SAVED VOCABULARY BANK</h2>
                     <div style="display: flex; gap: 10px;">
                         <button id="export-dictionary-txt-btn" class="canvas-btn" style="color: var(--neon-green); border-color: var(--border-color);">Export Dictionary as TXT</button>
+                        <!-- Integrated: Delete Selected from dictionary bank button [1] -->
+                        <button id="delete-selected-dict-btn" class="canvas-btn" style="color: var(--neon-orange); border-color: var(--border-color);" disabled>Delete Selected</button>
                         <button id="clear-dictionary-btn" class="canvas-btn" style="color: var(--neon-orange); border-color: var(--border-color);">Clear Dictionary</button>
                     </div>
                 </div>
                 <div class="callout" style="border-left-color: var(--neon-green); background-color: rgba(57, 255, 20, 0.01);">
                     <div class="callout-title" style="color: var(--neon-green);">Saved Terms Directory</div>
-                    Your custom-spawned and saved suggestion words are collected here in a persistent browser cache [1]. Click any word badge below to drop it onto your canvas board. Hover over a badge and click the <strong class="highlight-primary">"✕"</strong> in the corner to delete it from your dictionary permanently.
+                    Your custom-spawned and saved suggestion words are collected here in a persistent browser cache [1]. Click any word badge below to drop it onto your canvas board. Hover over a badge and click the <strong class="highlight-primary">"✕"</strong> in the corner to delete it from your dictionary permanently [1]. Hold <strong class="highlight-green">Ctrl + Click</strong> to highlight multiple words inside this bank to bulk delete them [1].
                 </div>
                 <div class="dashboard-card" style="min-height: 100px;">
                     <div id="custom-user-dictionary-bank" class="word-grid-container"></div>
@@ -215,21 +219,6 @@
                 </div>
             </section>
 
-            <!-- SECTION 4: THE SIMPLE RHYMING WORKSPACE -->
-            <section id="rhyme-tool" class="section-container">
-                <div class="section-header">
-                    <h2>&gt;_ SIMPLIFIED RHYMING TOOL</h2>
-                </div>
-                <div class="dashboard-card">
-                    <div style="display: flex; gap: 10px; margin-bottom: 12px; align-items: center;">
-                        <input type="text" id="rhyme-search-input" class="canvas-input" placeholder="Type word for rhymes (Perfect Rhymes API)..." autocomplete="off">
-                    </div>
-                    <div id="rhyme-suggestions-list" class="word-grid-container" style="min-height: 50px;">
-                        <span style="font-size:12px; font-style:italic; color:var(--text-secondary);">Type a word above to see real-time matches. Click on a rhyme to drop it onto your canvas.</span>
-                    </div>
-                </div>
-            </section>
-
             <!-- SECTION 5: THE REFERENCE DESK -->
             <section id="reference-desk" class="section-container">
                 <div class="section-header">
@@ -271,7 +260,6 @@
                             <h3 style="margin-bottom: 0; border: none; padding: 0;">Guitar Tunings &amp; Transcribed Tabs</h3>
                             
                             <div style="display: flex; gap: 10px;">
-                                <!-- Chromatic scale dropdown [1] -->
                                 <select id="chord-root-select" class="canvas-input" style="max-width: 120px; height: 32px; padding: 2px;">
                                     <option value="C">Key: C</option>
                                     <option value="C#">Key: C# / Db</option>
@@ -287,7 +275,6 @@
                                     <option value="B">Key: B</option>
                                 </select>
                                 
-                                <!-- Tuning block group dropdown [1] -->
                                 <select id="chord-tuning-select" class="canvas-input" style="max-width: 250px; height: 32px; padding: 2px;">
                                     <option value="group1">1. Drop C &amp; D Standard</option>
                                     <option value="group2" selected>2. Drop D &amp; E Standard</option>
@@ -310,205 +297,64 @@
                         </div>
                     </div>
 
-<!-- METER, PACING, AND SENSORY COMPLEMENTS MERGED UNDER UNIFIED NESTED AREA [1] -->
+                    <!-- REWORKED: ADDITIONAL INFO & STARTER TIPS -->
+                    <div class="dashboard-card" style="grid-column: 1 / -1;">
+                        <h3>
+                            <span>Additional Info &amp; Lyrical Pacing Guidelines</span>
+                            <span class="badge badge-cyan">Additional Info</span>
+                        </h3>
+                        <div class="fret-guide-row">
+                            <span class="highlight-cyan">The Zoom Method (Micro to Macro)</span>
+                            <span style="font-size: 12px; font-style: italic;">Start with an ultra-close physical detail (drywall flakes), then expand to a wide shot (neon horizon).</span>
+                        </div>
+                        <div class="fret-guide-row">
+                            <span class="highlight-cyan">The W3 Lyric Formula</span>
+                            <span style="font-size: 12px; font-style: italic;">Define Who is speaking, To Whom they are speaking, and Why they must speak right now to anchor your verse.</span>
+                        </div>
+                        <div class="fret-guide-row">
+                            <span class="highlight-cyan">Gibberish Automatic Writing</span>
+                            <span style="font-size: 12px; font-style: italic;">Track open-voiced vowels over looped progressions, preserve the dynamic vocal "feel", then map words to match.</span>
+                        </div>
+                        <div class="fret-guide-row">
+                            <span class="highlight-cyan">Decoupled Rhythm Vamping</span>
+                            <span style="font-size: 12px; font-style: italic;">Tap out a physical vocal rhythm (no pitches) over a loop first, then assign scale notes to those exact hit points.</span>
+                        </div>
+                        <p style="font-size: 12px; color: var(--text-secondary); margin-top: 10px; font-style: italic;">These core methodologies prevent melodic and structural writer's block during recording sessions.</p>
+                    </div>
                 </div>
 
-                <!-- NEW: UNIFIED & EXHAUSTIVE "ADDITIONAL INFO" REFERENCE SYSTEM (COLLAPSED TO START) [1] -->
+                <!-- SHOW VS TELL COMPARISON EXPANSION -->
                 <details>
-                    <summary>🧪 6. Additional Info &amp; Lyricist’s Songwriting Guide</summary>
+                    <summary>Show, Don't Tell Sensory Translation Table</summary>
                     <div class="details-body">
-                        
-                        <div class="callout" style="border-left-color: var(--theme-color-1); background-color: rgba(255, 215, 0, 0.01); margin-bottom: 20px;">
-                            <div class="callout-title">The Songwriter's Compass</div>
-                            Bypass creative blocks. These advanced, nested guides contain expert methodologies from prestigious music academies (Berklee College of Music) and legendary alternative musicians.
+                        <div class="table-wrapper" style="margin-bottom: 0;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Abstract Sentiment (Telling)</th>
+                                        <th>Concrete Physical Proxy (Showing)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="highlight-pink">"I am so anxious and scared."</td>
+                                        <td style="color: var(--text-primary); font-weight: bold;">"The thumb tearing the edge of a damp matchbook cover."</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="highlight-pink">"Our relationship was built on a lie."</td>
+                                        <td style="color: var(--text-primary); font-weight: bold;">"We built a sanctuary out of wet plaster and cardboard."</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="highlight-pink">"The memory of us still hurts."</td>
+                                        <td style="color: var(--text-primary); font-weight: bold;">"Fluorescent glare on wet asphalt at 4 AM."</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="highlight-pink">"I miss you and need your touch."</td>
+                                        <td style="color: var(--text-primary); font-weight: bold;">"Hold onto my throat, breathe into me."</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
-
-                        <!-- NESTED ACCORDIONS (COLLAPSED TO START) [1] -->
-                        
-                        <!-- PART A: SENSORY WRITING -->
-                        <details style="margin-left: 15px; margin-top: 10px;">
-                            <summary>📁 Part A: Sensory Ideation &amp; Destination Writing (Pat Pattison / Andrea Stolpe)</summary>
-                            <div class="details-body">
-                                <p style="margin-bottom: 12px; color: var(--text-primary); font-weight: bold; font-size: 14px;">Pat Pattison's 10-Minute Sensory Object Writing:</p>
-                                <p style="margin-bottom: 12px; font-size: 13px;">Write continuously for 10 minutes first thing in the morning using a physical object (like a key or a bone) as a prompt. Describe it using your 7 senses to ground your lyrics in reality.</p>
-                                
-                                <div class="table-wrapper">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th style="width: 30%;">The 7 Senses</th>
-                                                <th style="width: 70%;">Creative Concrete Application</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td class="highlight-cyan" style="font-weight: bold;">1. Visual</td>
-                                                <td>The flicker of static, the ceiling fan slicing up blue phosphor light.</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="highlight-cyan" style="font-weight: bold;">2. Auditory</td>
-                                                <td>The hum of ground loops, the groan of a train trestle.</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="highlight-cyan" style="font-weight: bold;">3. Olfactory</td>
-                                                <td>The chemical smell of bleach, diesel in the sheets, creosote.</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="highlight-cyan" style="font-weight: bold;">4. Gustatory</td>
-                                                <td>The mineral taste of rust on a wet lip, metallic blood, stale sweet milk.</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="highlight-cyan" style="font-weight: bold;">5. Tactile</td>
-                                                <td>The bite of cold metal springs, the grit of carpet fibers under a knuckle.</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="highlight-cyan" style="font-weight: bold;">6. Organic</td>
-                                                <td>A sudden cold spike in the gut, a panic attack, heart-rate acceleration.</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="highlight-cyan" style="font-weight: bold;">7. Kinesthetic</td>
-                                                <td>The sensation of a vertical drop, freefall, or circular drifting.</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <p style="margin-top: 20px; margin-bottom: 8px; color: var(--text-primary); font-weight: bold; font-size: 14px;">Andrea Stolpe's Destination Setting (Micro-Zoom Frame Shifts):</p>
-                                <div class="fret-guide-row">
-                                    <span class="highlight-pink">The Close-Up (Micro-Verse)</span>
-                                    <span>Start with a tiny physical close-up: "flakes of drywall on a mattress on the floor."</span>
-                                </div>
-                                <div class="fret-guide-row">
-                                    <span class="highlight-pink">The Wide Shot (Macro-Verse)</span>
-                                    <span>Zoom out to the wider scene: "fluorescent glare on wet asphalt at 4 AM."</span>
-                                </div>
-                            </div>
-                        </details>
-
-                        <!-- PART B: WORDPLAY & SHUFFLING -->
-                        <details style="margin-left: 15px; margin-top: 10px;">
-                            <summary>📁 Part B: Word Ladders &amp; Cut-Up Methods (Jeff Tweedy / David Bowie)</summary>
-                            <div class="details-body">
-                                <p style="margin-bottom: 12px; color: var(--text-primary); font-weight: bold; font-size: 14px;">Jeff Tweedy's "Nouns and Verbs" Word Ladder:</p>
-                                <p style="margin-bottom: 12px; font-size: 13px;">Tweedy (Wilco) designed this exercise to create non-cliché poetic friction. Write 10 verbs for a specific job, and 10 nouns in your room. Force random, uncomfortable pairings.</p>
-                                
-                                <div class="table-wrapper">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th style="width: 30%;">A Surgeon's Verbs</th>
-                                                <th style="width: 30%;">Nouns In Your Room</th>
-                                                <th style="width: 40%;">Unexpected Creative Pairings</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td class="highlight-purple">dissect</td>
-                                                <td>windowpane</td>
-                                                <td class="highlight-cyan" style="font-weight: bold;">"dissecting the windowpane"</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="highlight-purple">suture</td>
-                                                <td>turntable</td>
-                                                <td class="highlight-cyan" style="font-weight: bold;">"suturing the turntable"</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="highlight-purple">sedate</td>
-                                                <td>carpet</td>
-                                                <td class="highlight-cyan" style="font-weight: bold;">"sedating the carpet"</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <p style="margin-top: 20px; margin-bottom: 8px; color: var(--text-primary); font-weight: bold; font-size: 14px;">David Bowie &amp; Thom Yorke's Cut-Up Method:</p>
-                                <p style="font-size: 13px; line-height: 1.6;">Write out a full page of raw thoughts or diary entries. Physically cut the page into strips of single words or 2-3 word phrases. Scatter them on a table and manually shuffle them to find accidental, surreal lyric associations.</p>
-                            </div>
-                        </details>
-
-                        <!-- PART C: PROSODY & PACING -->
-                        <details style="margin-left: 15px; margin-top: 10px;">
-                            <summary>📁 Part C: Laws of Prosody &amp; Vocal Pacing (Sheila Davis / Berklee College)</summary>
-                            <div class="details-body">
-                                <p style="margin-bottom: 12px; color: var(--text-primary); font-weight: bold; font-size: 14px;">Sheila Davis's Structural Prosody (The Math of Emotion):</p>
-                                <p style="margin-bottom: 12px; font-size: 13px;">Prosody is when your chords, line counts, rhymes, and rhythms match the exact emotional state of your lyrics. Use structural stability to reflect safety, and structural instability to reflect anxiety or fear.</p>
-                                
-                                <div class="table-wrapper">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>Structural Property</th>
-                                                <th style="color: var(--neon-green);">Stable (Safety, Peace)</th>
-                                                <th style="color: var(--neon-orange);">Unstable (Anxiety, Paranoia)</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td style="font-weight: bold;">Line Count</td>
-                                                <td>Even line count (2, 4, 6, 8 lines)</td>
-                                                <td>Odd line count (3, 5, 7 lines)</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="font-weight: bold;">Rhyme Structure</td>
-                                                <td>Perfect, direct rhymes</td>
-                                                <td>Slant, assonant, or unrhymed endings</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="font-weight: bold;">Rhythmic Meter</td>
-                                                <td>Regular iambic meter</td>
-                                                <td>Irregular, syncopated, or trochaic meters</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="font-weight: bold;">Phrase Lengths</td>
-                                                <td>Standard, symmetrical lengths</td>
-                                                <td>Staggered, unpredictable, abrupt lengths</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <p style="margin-top: 20px; margin-bottom: 8px; color: var(--text-primary); font-weight: bold; font-size: 14px;">Vocal Pacing &amp; Beat "Body Language":</p>
-                                <div class="fret-guide-row">
-                                    <span class="highlight-cyan">Ahead of the Beat (Pushing)</span>
-                                    <span>Starts *before* Beat 1. Sounds urgent, demanding, or aggressive.</span>
-                                </div>
-                                <div class="fret-guide-row">
-                                    <span class="highlight-cyan">Behind the Beat (Dragging)</span>
-                                    <span>Starts *after* Beat 1/2. Sounds relaxed, detached, or melancholic.</span>
-                                </div>
-                                <div class="fret-guide-row">
-                                    <span class="highlight-cyan">The W3 Formula</span>
-                                    <span>Anchor every song: Who is speaking? To Whom? Why right now?</span>
-                                </div>
-                            </div>
-                        </details>
-
-                        <!-- PART D: OBLIQUE STRATEGIES -->
-                        <details style="margin-left: 15px; margin-top: 10px; margin-bottom: 10px;">
-                            <summary>📁 Part D: Oblique Studio Disrupters (Brian Eno / Peter Schmidt)</summary>
-                            <div class="details-body">
-                                <p style="margin-bottom: 12px; color: var(--text-primary); font-weight: bold; font-size: 14px;">Brian Eno's Lateral Thinking Prompts:</p>
-                                <p style="margin-bottom: 12px; font-size: 13px;">When tracking over a short pattern or loop starts to feel repetitive, force a physical disruption to trigger immediate creative pivots.</p>
-                                
-                                <div class="fret-guide-row">
-                                    <span class="highlight-primary">"Honor thy error..."</span>
-                                    <span>If a vocal pitch glitched or a guitar chord detuned, loop it and make it the focal point.</span>
-                                </div>
-                                <div class="fret-guide-row">
-                                    <span class="highlight-primary">"Decouple the Harmony"</span>
-                                    <span>Mute all chord instruments. Sing your melody over only the raw drums, then unmute.</span>
-                                </div>
-                                <div class="fret-guide-row">
-                                    <span class="highlight-primary">"Bore into the repetitive"</span>
-                                    <span>Identify the most boring, repetitive element of your loop. Make it the loudest for 4 bars.</span>
-                                </div>
-                                <div class="fret-guide-row">
-                                    <span class="highlight-primary">"Cut the connective tissue"</span>
-                                    <span>Delete full sentences. Condense lyrics to raw fragments (e.g. "Porch steps. Cold slate. Smoke.").</span>
-                                </div>
-                            </div>
-                        </details>
-
                     </div>
                 </details>
             </section>

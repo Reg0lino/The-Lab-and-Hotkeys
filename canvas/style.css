@@ -199,6 +199,15 @@ body {
     background-color: rgba(255, 255, 255, 0.02);
 }
 
+/* Disabled buttons (e.g. empty undo/redo stacks) */
+.canvas-btn:disabled {
+    opacity: 0.25;
+    cursor: not-allowed;
+    border-color: var(--border-color) !important;
+    color: var(--text-secondary) !important;
+    box-shadow: none !important;
+}
+
 .canvas-board {
     width: 100%;
     height: 100%;
@@ -208,7 +217,7 @@ body {
 }
 
 /* ==========================================================================
-   5. ABSOLUTE POSITIONED MAGNET ELEMENTS & CARD HOVER SAVE BINDINGS [1]
+   6. ABSOLUTE POSITIONED MAGNET ELEMENTS & CARD HOVER SAVE BINDINGS [1]
    ========================================================================== */
 .magnet-card {
     position: absolute;
@@ -240,6 +249,12 @@ body {
     box-shadow: 0 4px 10px rgba(0,0,0,0.5), 0 0 6px var(--theme-color-2);
 }
 
+/* Multi-Selection highlight border [1] */
+.magnet-card.selected {
+    border: 2px dashed var(--theme-color-1);
+    box-shadow: 0 0 12px var(--accent-glow);
+}
+
 /* Glowing green hover-save '+' bubble styling [1] */
 .card-save-plus {
     display: none;
@@ -266,7 +281,7 @@ body {
 }
 
 /* ==========================================================================
-   6. DEDICATED SUGGESTIONS DRAWER (STATIC SEPARATED BLOCK)
+   7. DEDICATED SUGGESTIONS DRAWER (STATIC SEPARATED BLOCK)
    ========================================================================== */
 .suggestions-drawer {
     background-color: var(--bg-card);
@@ -321,11 +336,17 @@ body {
 }
 
 /* ==========================================================================
-   7. SAVED VOCABULARY HOVER DELETION STYLING [1]
+   8. SAVED VOCABULARY HOVER DELETION & SELECT STYLING [1]
    ========================================================================== */
 .custom-badge-container {
     position: relative;
     display: inline-block;
+}
+
+/* Integrated: Highlight selected saved dictionary badges [1] */
+.custom-badge-container.selected-badge .word-badge {
+    border: 2px dashed var(--theme-color-1) !important;
+    box-shadow: 0 0 10px var(--accent-glow);
 }
 
 /* Deletion '✕' element only displays when hovering over its parent container [1] */
@@ -351,7 +372,7 @@ body {
 }
 
 /* ==========================================================================
-   8. IN-WINDOW CUSTOM MODAL DIALOGS [1]
+   9. IN-WINDOW CUSTOM MODAL DIALOGS [1]
    ========================================================================== */
 .modal-overlay {
     position: absolute;
@@ -404,7 +425,7 @@ body {
 }
 
 /* ==========================================================================
-   9. CORE PANELS, REF TABLES & WORD BANKS
+   10. CORE PANELS, REF TABLES & WORD BANKS
    ========================================================================== */
 .main-content {
     flex-grow: 1;
@@ -583,7 +604,7 @@ tr:nth-child(even) {
 }
 
 /* ==========================================================================
-   10. COMPLEMENTARY SYSTEMS
+   11. COMPLEMENTARY SYSTEMS
    ========================================================================== */
 .callout {
     background-color: rgba(255, 255, 255, 0.01);

@@ -1,6 +1,6 @@
 /**
  * THE LAB // drag.js
- * Unified Pointer-Event Drag-and-Drop Controller (with Drop-to-Save & Auto-Delete)
+ * Unified Pointer-Event Drag-and-Drop Controller (Symmetric Multi-Drag, Drop-to-Save & Auto-Delete)
  */
 
 const DragEngine = {
@@ -8,10 +8,12 @@ const DragEngine = {
     offsetX: 0,
     offsetY: 0,
     canvasBoard: null,
+    draggedCards: [],
+    startX: 0,
+    startY: 0,
 
     /**
      * Initializes pointer listeners on the parent board container
-     * @param {HTMLElement} boardElement - The container where words are dragged
      */
     init(boardElement) {
         if (!boardElement) return;
@@ -24,10 +26,10 @@ const DragEngine = {
     },
 
     /**
-     * Handles the initial pointer click/touch grab
+     * Handles card selections and dragging initializations
      */
     handlePointerDown(e) {
-        // Core Fix: Exit immediately if clicking the hover-save bubble to unblock click events [1]
+        // Exit immediately if clicking the hover-save bubble [1]
         if (e.target.classList.contains('card-save-plus')) {
             return;
         }
@@ -35,31 +37,79 @@ const DragEngine = {
         const card = e.target.closest('.magnet-card');
         if (!card) return;
 
+        // Interactive: Ctrl-Click / Cmd-Click selection toggling [1]
+        if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            card.classList.toggle('selected');
+            
+            // Update the state of the "Clear Board" to "Clear Selection" [1]
+            if (typeof window.updateClearButtonState === 'function') {
+                window.updateClearButtonState();
+            }
+            if (typeof StorageEngine !== 'undefined') {
+                StorageEngine.saveActiveDraft();
+            }
+            return; // Exit to prevent dragging during selection
+        }
+
         this.activeCard = card;
         this.activeCard.setPointerCapture(e.pointerId);
 
-        const rect = this.activeCard.getBoundingClientRect();
-        this.offsetX = e.clientX - rect.left;
-        this.offsetY = e.clientY - rect.top;
+        // Track the group of cards currently selected [1]
+        if (this.activeCard.classList.contains('selected')) {
+            this.draggedCards = Array.from(this.canvasBoard.querySelectorAll('.magnet-card.selected'));
+        } else {
+            this.draggedCards = [this.activeCard];
+        }
+
+        // Cache initial starting coordinates for the entire selected set [1]
+        this.draggedCards.forEach(c => {
+            c.dataset.startX = parseFloat(c.style.left) || 0;
+            c.dataset.startY = parseFloat(c.style.top) || 0;
+        });
+
+        // Store active grab points
+        this.startX = e.clientX;
+        this.startY = e.clientY;
     },
 
     /**
-     * Handles card movement and screen containment
+     * Handles symmetric, offset-retaining multi-dragging calculations [1]
      */
     handlePointerMove(e) {
         if (!this.activeCard) return;
 
         const containerRect = this.canvasBoard.getBoundingClientRect();
         
-        let targetX = e.clientX - containerRect.left - this.offsetX;
-        let targetY = e.clientY - containerRect.top - this.offsetY;
+        // Calculate dragging movement distance (delta) [1]
+        const deltaX = e.clientX - this.startX;
+        const deltaY = e.clientY - this.startY;
 
-        this.activeCard.style.left = targetX + 'px';
-        this.activeCard.style.top = targetY + 'px';
+        // Slide all selected cards by identical delta values to retain spatial offsets [1]
+        this.draggedCards.forEach(c => {
+            let targetX = (parseFloat(c.dataset.startX) || 0) + deltaX;
+            let targetY = (parseFloat(c.dataset.startY) || 0) + deltaY;
+
+            // Apply standard boundary constraints
+            const minX = 0;
+            const minY = 110; // Clearance for header + input rows
+            const maxX = containerRect.width - c.offsetWidth;
+            const maxY = containerRect.height - c.offsetHeight;
+
+            if (targetX < minX) targetX = minX;
+            if (targetX > maxX) targetX = maxX;
+            if (targetY < minY) targetY = minY;
+            if (targetY > maxY) targetY = maxY;
+
+            c.style.left = targetX + 'px';
+            c.style.top = targetY + 'px';
+        });
     },
 
     /**
-     * Releases pointer tracking, runs drop checks, and triggers auto-saves
+     * Runs multi-card drop saves and auto-deletes [1]
      */
     handlePointerUp(e) {
         if (!this.activeCard) return;
@@ -80,29 +130,34 @@ const DragEngine = {
         }
 
         if (droppedInDict) {
-            // Copy-on-Drop: Appends to custom dictionary but keeps the card active on canvas [1]
-            const word = this.activeCard.dataset.word || this.activeCard.textContent.trim();
-            if (typeof StorageEngine !== 'undefined') {
-                StorageEngine.addWordToCustomDictionary(word);
-            }
+            // Copy-on-Drop: Saves all currently dragged cards to vocabulary [1]
+            this.draggedCards.forEach(c => {
+                const word = c.dataset.word || c.textContent.trim();
+                if (typeof StorageEngine !== 'undefined') {
+                    StorageEngine.addWordToCustomDictionary(word);
+                }
+            });
         } else {
-            // 2. Boundary Checking: If dragged outside the visual canvas bounds, auto-delete it
+            // 2. Boundary Checking: If active dragged card goes off-board, delete the entire set [1]
             const padding = 10;
             const outOfLeft = (cardRect.right < boardRect.left + padding);
             const outOfRight = (cardRect.left > boardRect.right - padding);
-            const outOfTop = (cardRect.bottom < boardRect.top + 110); // Header + input clearance
+            const outOfTop = (cardRect.bottom < boardRect.top + 110);
             const outOfBottom = (cardRect.top > boardRect.bottom - padding);
 
             if (outOfLeft || outOfRight || outOfTop || outOfBottom) {
-                this.activeCard.remove();
+                this.draggedCards.forEach(c => c.remove());
+                if (typeof window.updateClearButtonState === 'function') {
+                    window.updateClearButtonState();
+                }
             }
         }
 
         this.activeCard.releasePointerCapture(e.pointerId);
         this.activeCard = null;
+        this.draggedCards = [];
 
-        // Call the storage controller auto-save function if registered
-        if (typeof StorageEngine !== 'undefined' && typeof StorageEngine.saveActiveDraft === 'function') {
+        if (typeof StorageEngine !== 'undefined') {
             StorageEngine.saveActiveDraft();
         }
     }
