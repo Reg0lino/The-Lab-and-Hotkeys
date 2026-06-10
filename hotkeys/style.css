@@ -240,3 +240,27 @@ kbd { background-color: #2a2a2a; border: 1px solid #555; border-radius: 3px; box
     box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
     color: #ffffff;
 }
+
+/* BRIDGE NAV BACK TO HOME PORTAL */
+#btn-back-home {
+    display: inline-block;
+    background: #111;
+    color: #00ccff; /* G910 Neon Blue to match your hotkey accents */
+    border: 1px solid #333;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: inherit;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, box-shadow 0.2s, color 0.2s;
+    margin-left: 10px;
+}
+
+#btn-back-home:hover {
+    background: #1a1a1a;
+    border-color: #00ccff;
+    box-shadow: 0 0 10px rgba(0, 204, 255, 0.4);
+    color: #ffffff;
+}

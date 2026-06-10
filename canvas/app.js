@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .catch(err => {
                 console.warn("Themes configuration file missing offline. Loading hardcoded default. ", err);
-                themeSelect.innerHTML = '<option value="theme-g910" selected>1. G910 HUD (DAW Default)</option>';
+                themeSelect.innerHTML = '<option value="theme-g910" selected>1. Dark and Yellow (Page Default)</option>';
                 document.body.className = 'theme-g910';
             });
     };
