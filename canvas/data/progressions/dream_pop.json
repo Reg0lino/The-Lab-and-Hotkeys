@@ -1,0 +1,20 @@
+[
+  {
+    "name": "The Pastel Wash",
+    "formula": "Imaj7 - IVmaj7",
+    "keys": "Cmaj7 - Fmaj7",
+    "vibe": "Slow, wide, and sparkly. Pure ethereal atmosphere."
+  },
+  {
+    "name": "Nostalgic Sparkle",
+    "formula": "I - vi - IV - V",
+    "keys": "G - Em - C - D",
+    "vibe": "Retro 50s feel drenched in chorus and reverb."
+  },
+  {
+    "name": "Sun-Drenched Loop",
+    "formula": "IV - V - iii - vi",
+    "keys": "F - G - Em - Am",
+    "vibe": "Warm but melancholic. Sounds like a fading summer."
+  }
+]

@@ -26,6 +26,41 @@ const ReferenceEngine = {
         'lofi_neo_soul': [
             { name: "Lo-Fi Jazz Nostalgia", formula: "ii7 - V9 - Imaj7 - IVmaj7", keys: "Dm7 - G9 - Cmaj7 - Fmaj7", vibe: "Relaxing, nostalgic, rainy jazz-hop structure." },
             { name: "Rainy Day Soul Loop", formula: "i9 - bVImaj7 - iv7 - bIImaj7", keys: "Cm9 - Abmaj7 - Fm7 - Dbmaj7", vibe: "Deeply melancholic lofi foundation. Extended intervals add warmth." }
+        ],
+        'punk_hardcore': [
+            { name: "The Classic Anthem", formula: "I - V - vi - IV", keys: "C - G - Am - F", vibe: "The foundation of pop-punk. Upbeat, catchy, and high energy." },
+            { name: "The Hardcore Stomp", formula: "i - bVI - bVII - i", keys: "Am - F - G - Am", vibe: "Relentless and driving. The 'wall of sound' for heavy verses." },
+            { name: "The Minor Descent", formula: "i - VII - VI - V", keys: "Am - G - F - E", vibe: "Dramatic and urgent." },
+            { name: "The Gritty Stomp", formula: "I - bVII - IV", keys: "A - G - D", vibe: "Raw, blues-punk swagger." },
+            { name: "The No-Frills Rocker", formula: "I - IV - V - IV", keys: "G - C - D - C", vibe: "Pure Ramones-style energy." }
+        ],
+        'mathcore_alt': [
+            { name: "The Jarring Shift", formula: "i - bII - V - i", keys: "Am - Bb - E - Am", vibe: "Angular and unsettling." },
+            { name: "The Tritone Stab", formula: "i - bV - i", keys: "Cm - Gb - Cm", vibe: "Brutal and unstable." },
+            { name: "The Chromatic Climb", formula: "i - bII - I (major)", keys: "Dm - Eb - F", vibe: "Disorienting chromatic movement." },
+            { name: "The Nervous Loop", formula: "i - bIII - bVII - IV", keys: "Em - G - D - A", vibe: "Creates a sense of unease." }
+        ],
+        'lofi_trip_hop': [
+            { name: "Nostalgic Chill", formula: "ii7 - V7 - Imaj7 - IVmaj7", keys: "Dm7 - G7 - Cmaj7 - Fmaj7", vibe: "The classic lo-fi 'rainy day' feel." },
+            { name: "The Trip-Hop Drag", formula: "i - bVI - iv - v", keys: "Cm - Ab - Fm - Gm", vibe: "Dark, moody, and heavy." },
+            { name: "Bittersweet Soul", formula: "i7 - IV7 - bVIImaj7", keys: "Bbm7 - Eb7 - Abmaj7", vibe: "A smooth, soulful loop." },
+            { name: "The Hazy Loop", formula: "Imaj7 - vi7 - ii7 - V7", keys: "Cmaj7 - Am7 - Dm7 - G7", vibe: "Hazy, dream-like atmosphere." }
+        ],
+        'dream_pop': [
+            { name: "The Pastel Wash", formula: "Imaj7 - IVmaj7", keys: "Cmaj7 - Fmaj7", vibe: "Slow, wide, and sparkly. Pure ethereal atmosphere." },
+            { name: "Nostalgic Sparkle", formula: "I - vi - IV - V", keys: "G - Em - C - D", vibe: "Retro 50s feel drenched in chorus and reverb." },
+            { name: "Sun-Drenched Loop", formula: "IV - V - iii - vi", keys: "F - G - Em - Am", vibe: "Warm but melancholic. Sounds like a fading summer." }
+        ],
+        'hiphop_dnb': [
+            { name: "The Boom-Bap Vamp", formula: "i7 - iv7", keys: "Am7 - Dm7", vibe: "The foundation of classic 90s hip hop. Deeply loopable." },
+            { name: "Phrygian Menace", formula: "i - bII", keys: "Em - F", vibe: "Ominous and aggressive. The 'dark' sound of DnB and Neurofunk." },
+            { name: "The Soul Sample", formula: "vi7 - ii7 - V7 - Imaj7", keys: "Am7 - Dm7 - G7 - Cmaj7", vibe: "Dusty, jazzy, and sophisticated. Great for boom-bap." },
+            { name: "The Drill Menace", formula: "i - bVI", keys: "Bm - G", vibe: "Minimal, heavy, and cold. Perfect for modern drill or dark trap." }
+        ],
+        'pop_anthems': [
+            { name: "The Emotional Powerhouse", formula: "vi - IV - I - V", keys: "Am - F - C - G", vibe: "The most successful progression in modern pop history. Instant resonance." },
+            { name: "The Upbeat Bounce", formula: "IV - V - vi - I", keys: "F - G - Am - C", vibe: "Driving, optimistic, and radio-ready." },
+            { name: "The Borrowed Heart", formula: "I - iii - IV - iv", keys: "C - Em - F - Fm", vibe: "The minor iv (Fm) at the end adds a sophisticated 'sting' of sadness." }
         ]
     },
 

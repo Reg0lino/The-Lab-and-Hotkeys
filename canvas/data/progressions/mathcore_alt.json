@@ -1,0 +1,26 @@
+[
+  {
+    "name": "The Jarring Shift",
+    "formula": "i - bII - V - i",
+    "keys": "Am - Bb - E - Am",
+    "vibe": "Angular and unsettling. The half-step jump from A to Bb creates immediate tension."
+  },
+  {
+    "name": "The Tritone Stab",
+    "formula": "i - bV - i",
+    "keys": "Cm - Gb - Cm",
+    "vibe": "Brutal and unstable. Less about melody, more about harmonic shock."
+  },
+  {
+    "name": "The Chromatic Climb",
+    "formula": "i - bII - I (major)",
+    "keys": "Dm - Eb - F",
+    "vibe": "Disorienting. A minor start that climbs chromatically to an unexpected major resolution."
+  },
+  {
+    "name": "The Nervous Loop",
+    "formula": "i - bIII - bVII - IV",
+    "keys": "Em - G - D - A",
+    "vibe": "Creates a sense of unease. Great for building tension before a breakdown."
+  }
+]

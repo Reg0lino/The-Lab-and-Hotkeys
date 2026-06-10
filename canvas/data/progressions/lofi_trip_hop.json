@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Nostalgic Chill",
+    "formula": "ii7 - V7 - Imaj7 - IVmaj7",
+    "keys": "Dm7 - G7 - Cmaj7 - Fmaj7",
+    "vibe": "The classic lo-fi 'rainy day' feel. Sophisticated but very relaxing."
+  },
+  {
+    "name": "The Trip-Hop Drag",
+    "formula": "i - bVI - iv - v",
+    "keys": "Cm - Ab - Fm - Gm",
+    "vibe": "Dark, moody, and heavy. Perfect for slow, dusty drum beats."
+  },
+  {
+    "name": "Bittersweet Soul",
+    "formula": "i7 - IV7 - bVIImaj7",
+    "keys": "Bbm7 - Eb7 - Abmaj7",
+    "vibe": "A smooth, soulful loop with a touch of melancholy."
+  },
+  {
+    "name": "The Hazy Loop",
+    "formula": "Imaj7 - vi7 - ii7 - V7",
+    "keys": "Cmaj7 - Am7 - Dm7 - G7",
+    "vibe": "Standard jazz turn-around stripped down for a hazy, dream-like atmosphere."
+  }
+]

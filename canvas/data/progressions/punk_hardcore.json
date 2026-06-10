@@ -1,0 +1,32 @@
+[
+  {
+    "name": "The Classic Anthem",
+    "formula": "I - V - vi - IV",
+    "keys": "C - G - Am - F",
+    "vibe": "The foundation of pop-punk. Upbeat, catchy, and high energy."
+  },
+  {
+    "name": "The Hardcore Stomp",
+    "formula": "i - bVI - bVII - i",
+    "keys": "Am - F - G - Am",
+    "vibe": "Relentless and driving. The 'wall of sound' for heavy verses."
+  },
+  {
+    "name": "The Minor Descent",
+    "formula": "i - VII - VI - V",
+    "keys": "Am - G - F - E",
+    "vibe": "Dramatic and urgent. The major V (E) creates a desperate pull back to the start."
+  },
+  {
+    "name": "The Gritty Stomp",
+    "formula": "I - bVII - IV",
+    "keys": "A - G - D",
+    "vibe": "Raw, blues-punk swagger. Sounds tough and unpolished."
+  },
+  {
+    "name": "The No-Frills Rocker",
+    "formula": "I - IV - V - IV",
+    "keys": "G - C - D - C",
+    "vibe": "Pure Ramones-style energy. Simple, effective, and loud."
+  }
+]

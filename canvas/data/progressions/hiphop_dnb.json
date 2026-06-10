@@ -1,0 +1,26 @@
+[
+  {
+    "name": "The Boom-Bap Vamp",
+    "formula": "i7 - iv7",
+    "keys": "Am7 - Dm7",
+    "vibe": "The foundation of classic 90s hip hop. Deeply loopable."
+  },
+  {
+    "name": "Phrygian Menace",
+    "formula": "i - bII",
+    "keys": "Em - F",
+    "vibe": "Ominous and aggressive. The 'dark' sound of DnB and Neurofunk."
+  },
+  {
+    "name": "The Soul Sample",
+    "formula": "vi7 - ii7 - V7 - Imaj7",
+    "keys": "Am7 - Dm7 - G7 - Cmaj7",
+    "vibe": "Dusty, jazzy, and sophisticated. Great for boom-bap."
+  },
+  {
+    "name": "The Drill Menace",
+    "formula": "i - bVI",
+    "keys": "Bm - G",
+    "vibe": "Minimal, heavy, and cold. Perfect for modern drill or dark trap."
+  }
+]
