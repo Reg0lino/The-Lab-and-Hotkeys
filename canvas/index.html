@@ -112,7 +112,6 @@
                             <button id="select-all-btn" class="canvas-btn" style="color: var(--neon-green); border-color: var(--border-color);">Select All</button>
                             <button id="deselect-all-btn" class="canvas-btn" style="color: var(--text-secondary); border-color: var(--border-color);" disabled>Deselect All</button>
                             <button id="delete-selected-board-btn" class="canvas-btn" style="color: var(--neon-orange); border-color: var(--border-color);" disabled>Delete Selection</button>
-                            <button id="save-board-btn" class="canvas-btn" style="color: var(--theme-color-1); border-color: var(--border-color);">Save Board</button>
                             <button id="export-png-btn" class="canvas-btn" style="color: var(--theme-color-1); border-color: var(--border-color);">Snapshot PNG</button>
                             <button id="copy-text-btn" class="canvas-btn" style="color: var(--neon-green); border-color: var(--border-color);">Copy Text</button>
                             <button id="clear-board-btn" class="canvas-btn" style="color: var(--neon-orange); border-color: var(--border-color);">Clear Board</button>
@@ -121,8 +120,8 @@
 
                     <!-- DEDICATED SPACIOUS INPUT ROW WITH RANDOM DICE BUTTON -->
                     <div class="canvas-input-row">
-                        <input type="text" id="custom-word-input" class="canvas-input" placeholder="Type custom word (Auto-suggests related words)..." autocomplete="off">
-                        <button id="random-word-btn" class="canvas-btn" title="Spawn random expressive noun/adjective/verb" style="padding: 8px 10px; font-size: 14px;">🎲</button>
+                        <input type="text" id="custom-word-input" class="canvas-input" placeholder="Type custom word(s) (Auto-suggests related words or enters whole sentences into canvas)..." autocomplete="off">
+                        <button id="random-word-btn" class="canvas-btn" title="Spawn random noun/verb from word pools below" style="padding: 8px 10px; font-size: 14px;">🎲</button>
                         <select id="api-mode-select" class="canvas-input" style="max-width: 150px; height: 35px; padding: 4px;">
                             <option value="means_like" selected>Means-Like</option>
                             <option value="perfect_rhyme">Perfect Rhyme</option>
@@ -135,7 +134,7 @@
                             <option value="antonyms">Antonyms</option>
                             <option value="local_particles">Particles &amp; Connectors</option>
                         </select>
-                        <button id="add-word-btn" class="canvas-btn">Add</button>
+                        <button id="add-word-btn" title="Add single word for search or type whole sentence to add each word into the canvas seperately." class="canvas-btn">Add</button>
                     </div>
 
                     <!-- ACTIVE DRAG BOARD -->
