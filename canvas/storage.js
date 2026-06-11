@@ -65,8 +65,8 @@ const StorageEngine = {
 
         this.undoStack.push(jsonString);
         
-        // Enforce strict 4-step history cap
-        if (this.undoStack.length > 4) {
+        // Enforce strict 20-step history cap
+        if (this.undoStack.length > 20) {
             this.undoStack.shift();
         }
 
