@@ -426,33 +426,64 @@ const StorageEngine = {
         });
     },
 
-    /**
-     * Resolves: Deep-clones the active canvas layout under a new name
+/**
+     * Deep-clones the active canvas layout under a new name, checking for existing overwrites [1]
      */
-    saveActiveProjectAs(newName) {
+    async saveActiveProjectAs(newName) {
         const activeProject = this.projects.find(p => p.id === this.activeProjectId);
-        const currentWords = activeProject ? JSON.parse(JSON.stringify(activeProject.words)) : []; // Deep-clone array
+        const currentWords = activeProject ? JSON.parse(JSON.stringify(activeProject.words)) : []; // Deep-clone array [1]
 
-        const uniqueId = 'project_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
-        const duplicatedProject = {
-            id: uniqueId,
-            name: newName,
-            created: Date.now(),
-            lastUpdated: Date.now(),
-            words: currentWords
-        };
+        const cleanedName = newName.trim();
 
-        // Add copy to local database array
-        this.projects.push(duplicatedProject);
-        localStorage.setItem(this.storageKey, JSON.stringify(this.projects));
+        // 1. Check if a project with the same name already exists in your local database [1]
+        const existingProject = this.projects.find(p => p.name.toLowerCase() === cleanedName.toLowerCase());
 
-        // Switch active view to newly duplicated project ID
-        this.activeProjectId = uniqueId;
-        localStorage.setItem(this.activeProjectIdKey, uniqueId);
-        
-        // Clear modified asterisk flag on explicit named saves
+        if (existingProject) {
+            // Self-Save Check: If they typed the name of the project they are already working on, just save [1]
+            if (existingProject.id === this.activeProjectId) {
+                existingProject.name = cleanedName;
+                window.hasUnsavedChanges = false;
+                this.saveActiveDraft(true);
+                this.syncDropdown();
+                return;
+            }
+
+            // 2. Overwrite check: Trigger custom confirmation modal warning [1]
+            const confirmed = await window.customConfirm("Overwrite Sketch", `A sketch named "${existingProject.name}" already exists. Do you want to overwrite it?`);
+            if (!confirmed) {
+                return; // Abort saving if they click Cancel [1]
+            }
+
+            // 3. Overwrite the existing project's card layout with our active layout [1]
+            existingProject.words = currentWords;
+            existingProject.lastUpdated = Date.now();
+
+            // Switch active view to the overwritten project ID [1]
+            this.activeProjectId = existingProject.id;
+            localStorage.setItem(this.activeProjectIdKey, existingProject.id);
+        } else {
+            // 4. Create new duplicated project if the name is unique [1]
+            const uniqueId = 'project_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+            const duplicatedProject = {
+                id: uniqueId,
+                name: cleanedName,
+                created: Date.now(),
+                lastUpdated: Date.now(),
+                words: currentWords
+            };
+
+            this.projects.push(duplicatedProject);
+            localStorage.setItem(this.storageKey, JSON.stringify(this.projects));
+
+            // Switch view to the new project ID [1]
+            this.activeProjectId = uniqueId;
+            localStorage.setItem(this.activeProjectIdKey, uniqueId);
+        }
+
+        // Clear modified asterisk flag on successful saves [1]
         window.hasUnsavedChanges = false;
 
+        localStorage.setItem(this.storageKey, JSON.stringify(this.projects));
         this.syncDropdown();
         this.loadActiveDraft();
         this.triggerVisualSavedIndicator();

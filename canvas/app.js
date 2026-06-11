@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const cancelBtn = document.getElementById('modal-btn-cancel');
 
             titleEl.textContent = title.toUpperCase();
-            bodyEl.textContent = message;
+            bodyEl.innerHTML = message; // Aligned: Allows html tags inside the custom prompt
             
             // Show prompt text input, pre-populate value, and select it
             inputEl.value = defaultValue;
@@ -812,14 +812,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-// Integrated: Save As click handler (Prompts for custom named save)
+// Integrated: Save As click handler (Prompts for custom named save) [1]
     if (saveAsBtn) {
         saveAsBtn.addEventListener('click', async () => {
             const activeProject = StorageEngine.projects.find(p => p.id === StorageEngine.activeProjectId);
             if (!activeProject) return;
 
-            // Calls our custom in-window prompt, pre-populated with active draft name
-            const newName = await window.customPrompt("Save As", "Enter a new name for this draft:", activeProject.name);
+            // Aligned: Inserts a line break and styled bold warning using the orange variable [1]
+            const warningMessage = "Enter a new name for this draft:<br><b style='color: var(--neon-orange); display: inline-block; margin-top: 8px;'>(Warning: Use New Name or Overwrite)</b>";
+
+            // Calls our custom in-window prompt, pre-populated with active draft name [1]
+            const newName = await window.customPrompt("Save As", warningMessage, activeProject.name);
             if (newName && newName.trim()) {
                 StorageEngine.saveActiveProjectAs(newName.trim());
             }
