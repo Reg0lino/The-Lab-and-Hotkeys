@@ -209,6 +209,101 @@ const StorageEngine = {
     },
 
     /**
+     * Serializes all song drafts, user dictionaries, and theme variables into a single downloadable JSON backup file [1]
+     */
+    exportSystemBackup() {
+        if (this.projects.length === 0) {
+            window.customAlert("Empty Database", "You have no song drafts to backup.");
+            return;
+        }
+
+        const backupData = {
+            app_identifier: "the_lab_backup",
+            version: "2.0",
+            timestamp: Date.now(),
+            active_project_id: this.activeProjectId,
+            projects: this.projects,
+            custom_dictionary: this.customDictionary,
+            active_theme: localStorage.getItem('the_lab_active_theme') || 'theme-g910'
+        };
+
+        const jsonString = JSON.stringify(backupData, null, 2);
+        const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8' });
+        
+        // Fetch active draft name, sanitize it into a safe filename, and append current date [1]
+        const activeProject = this.projects.find(p => p.id === this.activeProjectId);
+        const rawName = activeProject ? activeProject.name : 'backup';
+        const safeName = rawName.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_'); // Replaces spaces/asterisks with clean underscores [1]
+        
+        const today = new Date().toISOString().slice(0, 10).replace(/-/g, '_');
+        const fileName = `${safeName}_${today}.json`; // Compiles "[UserTitle]_[Date].json" [1]
+
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    },
+
+    /**
+     * Parses an uploaded JSON backup file and restores the entire workspace state [1]
+     * @param {File} file - The uploaded .json file
+     */
+    importSystemBackup(file) {
+        if (!file) return;
+
+        const reader = new FileReader(); // Native browser file reader [1]
+        
+        reader.onload = async (e) => {
+            try {
+                const data = JSON.parse(e.target.result); // Parse uploaded text string [1]
+
+                // Security Check: Verify structural identifier [1]
+                if (data.app_identifier !== 'the_lab_backup') {
+                    await window.customAlert("Invalid File", "This file is not a valid Lab backup configuration.");
+                    return;
+                }
+
+                const confirmed = await window.customConfirm("Restore Backup", `Importing this backup will overwrite your current active database. Are you sure you want to load ${data.projects.length} drafts?`);
+                if (confirmed) {
+                    // Overwrite memory arrays
+                    this.projects = data.projects;
+                    this.customDictionary = data.custom_dictionary || [];
+                    this.activeProjectId = data.active_project_id || data.projects[0].id;
+
+                    // Write back into persistent browser storage
+                    localStorage.setItem(this.storageKey, JSON.stringify(this.projects));
+                    localStorage.setItem(this.customDictionaryKey, JSON.stringify(this.customDictionary));
+                    localStorage.setItem(this.activeProjectIdKey, this.activeProjectId);
+                    
+                    if (data.active_theme) {
+                        localStorage.setItem('the_lab_active_theme', data.active_theme);
+                        document.body.className = data.active_theme;
+                        const themeSelect = document.getElementById('theme-select');
+                        if (themeSelect) themeSelect.value = data.active_theme;
+                    }
+
+                    // Refresh all GUI sub-components
+                    this.syncDropdown();
+                    this.loadActiveDraft();
+                    this.renderCustomDictionaryBank();
+                    if (typeof window.updateClearButtonState === 'function') {
+                        window.updateClearButtonState();
+                    }
+
+                    await window.customAlert("Import Successful", `Successfully restored ${this.projects.length} song drafts and ${this.customDictionary.length} custom vocabulary words.`);
+                }
+            } catch (err) {
+                console.error("JSON parse failed: ", err);
+                window.customAlert("Corrupted File", "An error occurred while reading the file. The backup data is corrupted.");
+            }
+        };
+
+        reader.readAsText(file); // Trigger async read [1]
+    },
+
+    /**
      * Renders the custom saved words inside their own distinct UI section [1]
      */
     renderCustomDictionaryBank() {
@@ -312,6 +407,9 @@ const StorageEngine = {
             if (!isUndoRedoAction) {
                 const previousState = JSON.stringify(this.projects[pIndex].words);
                 this.pushHistoryState(previousState);
+                                
+                // Set unsaved changes flag on user modifications [1]
+                window.hasUnsavedChanges = true;
             }
 
             this.projects[pIndex].words = wordData;
@@ -319,6 +417,7 @@ const StorageEngine = {
         }
 
         localStorage.setItem(this.storageKey, JSON.stringify(this.projects));
+        this.syncDropdown();
         this.triggerVisualSavedIndicator();
     },
 
@@ -418,10 +517,32 @@ const StorageEngine = {
         sorted.forEach(p => {
             const opt = document.createElement('option');
             opt.value = p.id;
-            opt.textContent = p.name;
+            
+            // If this is the active project and has unsaved changes, append "*" [1]
+            const isUnsaved = (p.id === this.activeProjectId && window.hasUnsavedChanges);
+            opt.textContent = p.name + (isUnsaved ? ' *' : '');
+            
             if (p.id === this.activeProjectId) opt.selected = true;
             this.selectElement.appendChild(opt);
         });
+    },
+
+    /**
+     * Duplicates or renames the active draft under a new name [1]
+     */
+    saveActiveProjectAs(newName) {
+        const activeProject = this.projects.find(p => p.id === this.activeProjectId);
+        if (!activeProject) return;
+
+        activeProject.name = newName;
+        activeProject.lastUpdated = Date.now();
+        
+        // Clear modified asterisk flag on explicit named saves [1]
+        window.hasUnsavedChanges = false;
+
+        localStorage.setItem(this.storageKey, JSON.stringify(this.projects));
+        this.syncDropdown();
+        this.triggerVisualSavedIndicator();
     },
 
     triggerVisualSavedIndicator() {

@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const exportDictTxtBtn = document.getElementById('export-dictionary-txt-btn');
     const clearDictBtn = document.getElementById('clear-dictionary-btn');
     const saveBoardBtn = document.getElementById('save-board-btn');
+    const saveAsBtn = document.getElementById('save-as-btn');
     
     // Undo / Redo / Select elements [1]
     const undoBtn = document.getElementById('undo-btn');
@@ -57,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.hoveredCard = null; // Add this line to track hover states [1]
     window.hoveredDictBadge = null; // Track dictionary badges for deletion [1]
 
-    // ==========================================================================
+// ==========================================================================
     // 2. IN-WINDOW PROMISE MODAL OVERLAYS (RESOLVES BROWSER POPUPS RISK) [1]
     // ==========================================================================
     window.customAlert = function(title, message) {
@@ -65,11 +66,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const overlay = document.getElementById('custom-modal');
             const titleEl = document.getElementById('modal-title');
             const bodyEl = document.getElementById('modal-body');
+            const inputEl = document.getElementById('modal-input');
             const confirmBtn = document.getElementById('modal-btn-confirm');
             const cancelBtn = document.getElementById('modal-btn-cancel');
 
             titleEl.textContent = title.toUpperCase();
             bodyEl.textContent = message;
+            inputEl.style.display = 'none'; // Ensure prompt text input is hidden [1]
             cancelBtn.style.display = 'none'; // Hide cancel button for simple alerts
             overlay.style.display = 'flex';
 
@@ -91,11 +94,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const overlay = document.getElementById('custom-modal');
             const titleEl = document.getElementById('modal-title');
             const bodyEl = document.getElementById('modal-body');
+            const inputEl = document.getElementById('modal-input');
             const confirmBtn = document.getElementById('modal-btn-confirm');
             const cancelBtn = document.getElementById('modal-btn-cancel');
 
             titleEl.textContent = title.toUpperCase();
             bodyEl.textContent = message;
+            inputEl.style.display = 'none'; // Ensure prompt text input is hidden [1]
             cancelBtn.style.display = 'inline-block'; // Show cancel button for confirmations
             overlay.style.display = 'flex';
 
@@ -114,6 +119,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
             confirmBtn.addEventListener('click', onConfirm);
             cancelBtn.addEventListener('click', onCancel);
+        });
+    };
+
+    window.customPrompt = function(title, message, defaultValue = '') {
+        return new Promise((resolve) => {
+            const overlay = document.getElementById('custom-modal');
+            const titleEl = document.getElementById('modal-title');
+            const bodyEl = document.getElementById('modal-body');
+            const inputEl = document.getElementById('modal-input');
+            const confirmBtn = document.getElementById('modal-btn-confirm');
+            const cancelBtn = document.getElementById('modal-btn-cancel');
+
+            titleEl.textContent = title.toUpperCase();
+            bodyEl.textContent = message;
+            
+            // Show prompt text input, pre-populate value, and select it [1]
+            inputEl.value = defaultValue;
+            inputEl.style.display = 'block';
+            cancelBtn.style.display = 'inline-block';
+            overlay.style.display = 'flex';
+
+            inputEl.focus();
+            inputEl.select(); // Pre-selects text for immediate typing/overwriting [1]
+
+            const cleanup = (result) => {
+                overlay.style.display = 'none';
+                inputEl.style.display = 'none'; // Hide text input again [1]
+                confirmBtn.removeEventListener('click', onConfirm);
+                cancelBtn.removeEventListener('click', onCancel);
+                inputEl.removeEventListener('keydown', onInputKeyDown);
+                resolve(result);
+            };
+
+            const onConfirm = () => cleanup(inputEl.value.trim());
+            const onCancel = () => cleanup(null);
+
+            const onInputKeyDown = (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    onConfirm();
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    onCancel();
+                }
+            };
+
+            confirmBtn.addEventListener('click', onConfirm);
+            cancelBtn.addEventListener('click', onCancel);
+            inputEl.addEventListener('keydown', onInputKeyDown);
         });
     };
 
@@ -246,6 +300,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const root = chordRootSelect.value;
         const group = chordTuningSelect.value;
         
+        // Save active selections to local storage cache [1]
+        localStorage.setItem('the_lab_active_chord_root', root);
+        localStorage.setItem('the_lab_active_chord_group', group);
+        
         const fileMap = {
             'C': 'key_c', 'C#': 'key_c_sharp', 'D': 'key_d', 'D#': 'key_d_sharp',
             'E': 'key_e', 'F': 'key_f', 'F#': 'key_f_sharp', 'G': 'key_g',
@@ -290,8 +348,16 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     chordRootSelect.addEventListener('change', loadTranscribedChords);
-    chordTuningSelect.addEventListener('change', loadTranscribedChords);
-    loadTranscribedChords(); // Initial run
+            chordTuningSelect.addEventListener('change', loadTranscribedChords);
+            
+            // Retrieve and apply cached selections on startup [1]
+            const savedRoot = localStorage.getItem('the_lab_active_chord_root') || 'A';
+            const savedGroup = localStorage.getItem('the_lab_active_chord_group') || 'group1';
+            chordRootSelect.value = savedRoot;
+            chordTuningSelect.value = savedGroup;
+            
+            // Initial load for chord tab panel
+            loadTranscribedChords();
 
     // ==========================================================================
     // 7. DYNAMIC OFFLINE WORD POOL LOADER [1]
@@ -558,6 +624,37 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+// ==========================================================================
+    // 13. SYSTEM BACKUP BINDINGS (JSON EXPORT/IMPORT) [1]
+    // ==========================================================================
+    const exportBackupBtn = document.getElementById('export-backup-btn');
+    const importBackupBtn = document.getElementById('import-backup-btn');
+    const importFileInput = document.getElementById('import-file-input');
+
+    if (exportBackupBtn) {
+        exportBackupBtn.addEventListener('click', () => {
+            if (typeof StorageEngine !== 'undefined') StorageEngine.exportSystemBackup();
+        });
+    }
+
+    if (importBackupBtn && importFileInput) {
+        // Clicking "Import Backup" programmatically triggers your browser file dialog
+        importBackupBtn.addEventListener('click', () => {
+            importFileInput.click();
+        });
+
+        // Event listener triggers when a file is successfully selected
+        importFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file && typeof StorageEngine !== 'undefined') {
+                StorageEngine.importSystemBackup(file);
+            }
+            importFileInput.value = ''; // Reset input to allow re-uploading same file
+        });
+    }
+
+
+
     // Hardware Keyboard listeners for Undo/Redo & Deletions [1]
     document.addEventListener('keydown', async (e) => {
         // Ignore hotkeys if user is currently typing inside active fields
@@ -715,20 +812,49 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Integrated: Save Board click handler (Saves all active canvas words to vocabulary in one pass) [1]
-    if (saveBoardBtn) {
-        saveBoardBtn.addEventListener('click', () => {
-            const cards = Array.from(board.querySelectorAll('.magnet-card'));
-            if (cards.length === 0) {
-                window.customAlert("Save Board", "Your canvas is currently empty. Spawn some words first.");
-                return;
+// Integrated: Save As click handler (Prompts for custom named save) [1]
+    if (saveAsBtn) {
+        saveAsBtn.addEventListener('click', async () => {
+            const activeProject = StorageEngine.projects.find(p => p.id === StorageEngine.activeProjectId);
+            if (!activeProject) return;
+
+            // Calls our custom in-window prompt, pre-populated with active draft name [1]
+            const newName = await window.customPrompt("Save As", "Enter a new name for this draft:", activeProject.name);
+            if (newName && newName.trim()) {
+                StorageEngine.saveActiveProjectAs(newName.trim());
+            }
+        });
+    }
+
+    // Integrated: New Draft Safety Shield (Prompts for custom named save on unsaved changes) [1]
+    if (createDraftBtn) {
+        // We override the default click listener to add our safety check first [1]
+        createDraftBtn.replaceWith(createDraftBtn.cloneNode(true)); // Strip old listener cleanly
+        const freshCreateBtn = document.getElementById('create-draft-btn');
+        
+        freshCreateBtn.addEventListener('click', async () => {
+            const name = newDraftInput.value.trim();
+            if (!name) return;
+
+            // If there are unsaved changes on the active board, prompt to save them first [1]
+            if (window.hasUnsavedChanges) {
+                const confirmed = await window.customConfirm("Unsaved Changes", "You have unsaved changes on your active board. Would you like to save them first before starting a new sketch?");
+                if (confirmed) {
+                    const activeProject = StorageEngine.projects.find(p => p.id === StorageEngine.activeProjectId);
+                    // Calls custom in-window prompt, pre-populated with active draft name [1]
+                    const newName = await window.customPrompt("Save As", "Enter a name to save your active draft:", activeProject ? activeProject.name : 'sketch');
+                    if (newName && newName.trim()) {
+                        StorageEngine.saveActiveProjectAs(newName.trim());
+                    } else {
+                        return; // Cancel creation if they cancelled the save
+                    }
+                }
             }
 
-            // Aligned Fix: Maps using clean data-attributes instead of textContent [1]
-            const wordsArray = cards.map(card => card.dataset.word);
-            if (typeof StorageEngine !== 'undefined') {
-                StorageEngine.saveAllToCustomDictionary(wordsArray);
-            }
+            // Start completely fresh
+            window.hasUnsavedChanges = false;
+            StorageEngine.createDraft(name);
+            newDraftInput.value = '';
         });
     }
 
