@@ -29,7 +29,7 @@ const DragEngine = {
      * Handles card selections and dragging initializations
      */
     handlePointerDown(e) {
-        // Exit immediately if clicking the hover-save bubble  .
+        // Exit immediately if clicking the hover-save bubble
         if (e.target.classList.contains('card-save-plus')) {
             return;
         }
@@ -37,14 +37,14 @@ const DragEngine = {
         const card = e.target.closest('.magnet-card');
         if (!card) return;
 
-        // Interactive: Ctrl-Click / Cmd-Click selection toggling  .
+        // Interactive: Ctrl-Click / Cmd-Click selection toggling
         if (e.ctrlKey || e.metaKey) {
             e.preventDefault();
             e.stopPropagation();
             
             card.classList.toggle('selected');
             
-            // Update the state of the "Clear Board" to "Clear Selection"  .
+            // Update the state of the "Clear Board" to "Clear Selection"
             if (typeof window.updateClearButtonState === 'function') {
                 window.updateClearButtonState();
             }
@@ -57,14 +57,14 @@ const DragEngine = {
         this.activeCard = card;
         this.activeCard.setPointerCapture(e.pointerId);
 
-        // Track the group of cards currently selected  .
+        // Track the group of cards currently selected
         if (this.activeCard.classList.contains('selected')) {
             this.draggedCards = Array.from(this.canvasBoard.querySelectorAll('.magnet-card.selected'));
         } else {
             this.draggedCards = [this.activeCard];
         }
 
-        // Cache initial starting coordinates for the entire selected set  .
+        // Cache initial starting coordinates for the entire selected set
         this.draggedCards.forEach(c => {
             c.dataset.startX = parseFloat(c.style.left) || 0;
             c.dataset.startY = parseFloat(c.style.top) || 0;
@@ -76,18 +76,18 @@ const DragEngine = {
     },
 
     /**
-     * Handles symmetric, offset-retaining multi-dragging calculations  .
+     * Handles symmetric, offset-retaining multi-dragging calculations
      */
     handlePointerMove(e) {
         if (!this.activeCard) return;
 
         const containerRect = this.canvasBoard.getBoundingClientRect();
         
-        // Calculate dragging movement distance (delta)  .
+        // Calculate dragging movement distance (delta)
         const deltaX = e.clientX - this.startX;
         const deltaY = e.clientY - this.startY;
 
-        // Slide all selected cards by identical delta values to retain spatial offsets  .
+        // Slide all selected cards by identical delta values to retain spatial offsets
         this.draggedCards.forEach(c => {
             let targetX = (parseFloat(c.dataset.startX) || 0) + deltaX;
             let targetY = (parseFloat(c.dataset.startY) || 0) + deltaY;
@@ -109,7 +109,7 @@ const DragEngine = {
     },
 
     /**
-     * Runs multi-card drop saves and auto-deletes  .
+     * Runs multi-card drop saves and auto-deletes
      */
     handlePointerUp(e) {
         if (!this.activeCard) return;
@@ -130,7 +130,7 @@ const DragEngine = {
         }
 
         if (droppedInDict) {
-            // Copy-on-Drop: Saves all currently dragged cards to vocabulary  .
+            // Copy-on-Drop: Saves all currently dragged cards to vocabulary
             this.draggedCards.forEach(c => {
                 const word = c.dataset.word || c.textContent.trim();
                 if (typeof StorageEngine !== 'undefined') {
@@ -138,7 +138,7 @@ const DragEngine = {
                 }
             });
         } else {
-            // 2. Boundary Checking: If active dragged card goes off-board, delete the entire set  .
+            // 2. Boundary Checking: If active dragged card goes off-board, delete the entire set
             const padding = 10;
             const outOfLeft = (cardRect.right < boardRect.left + padding);
             const outOfRight = (cardRect.left > boardRect.right - padding);

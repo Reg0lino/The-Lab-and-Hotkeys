@@ -11,7 +11,7 @@
     --card-padding: 16px;
     
     --font-mono: "Consolas", "Courier New", Courier, monospace;
-    --font-sans: 'Segoe UI', Tahoma, sans-serif; /* Aligned: Matches hotkeys typography  . */
+    --font-sans: 'Segoe UI', Tahoma, sans-serif; /* Aligned: Matches hotkeys typography */
 }
 
 /* ==========================================================================
@@ -217,7 +217,7 @@ body {
 }
 
 /* ==========================================================================
-   6. ABSOLUTE POSITIONED MAGNET ELEMENTS & CARD HOVER SAVE BINDINGS  .
+   6. ABSOLUTE POSITIONED MAGNET ELEMENTS & CARD HOVER SAVE BINDINGS
    ========================================================================== */
 .magnet-card {
     position: absolute;
@@ -249,13 +249,13 @@ body {
     box-shadow: 0 4px 10px rgba(0,0,0,0.5), 0 0 6px var(--theme-color-2);
 }
 
-/* Multi-Selection highlight border  . */
+/* Multi-Selection highlight border */
 .magnet-card.selected {
     border: 2px dashed var(--theme-color-1);
     box-shadow: 0 0 12px var(--accent-glow);
 }
 
-/* Glowing green hover-save '+' bubble styling  . */
+/* Glowing green hover-save '+' bubble styling */
 .card-save-plus {
     display: none;
     position: absolute;
@@ -275,7 +275,7 @@ body {
     line-height: 1;
 }
 
-/* Reveals '+' bubble only when hovering over active magnet cards  . */
+/* Reveals '+' bubble only when hovering over active magnet cards */
 .magnet-card:hover .card-save-plus {
     display: flex;
 }
@@ -336,20 +336,20 @@ body {
 }
 
 /* ==========================================================================
-   8. SAVED VOCABULARY HOVER DELETION & SELECT STYLING  .
+   8. SAVED VOCABULARY HOVER DELETION & SELECT STYLING
    ========================================================================== */
 .custom-badge-container {
     position: relative;
     display: inline-block;
 }
 
-/* Integrated: Highlight selected saved dictionary badges  . */
+/* Integrated: Highlight selected saved dictionary badges */
 .custom-badge-container.selected-badge .word-badge {
     border: 2px dashed var(--theme-color-1) !important;
     box-shadow: 0 0 10px var(--accent-glow);
 }
 
-/* Deletion '✕' element only displays when hovering over its parent container  . */
+/* Deletion '✕' element only displays when hovering over its parent container */
 .custom-badge-container:hover .dictionary-badge-delete-x {
     display: flex;
 }
@@ -372,7 +372,7 @@ body {
 }
 
 /* ==========================================================================
-   9. IN-WINDOW CUSTOM MODAL DIALOGS  .
+   9. IN-WINDOW CUSTOM MODAL DIALOGS
    ========================================================================== */
 .modal-overlay {
     position: absolute;
