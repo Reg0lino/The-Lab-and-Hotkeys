@@ -83,10 +83,10 @@ const ReferenceEngine = {
     },
 
     /**
-     * Switches the active progressions directory (fetching JSON with offline fallback) [1]
+     * Switches the active progressions directory (fetching JSON with offline fallback)  .
      */
     switchDirectory(directoryId) {
-        // Attempt to fetch from external JSON file first (GitHub Pages or local server) [1]
+        // Attempt to fetch from external JSON file first (GitHub Pages or local server)  .
         const url = `data/progressions/${directoryId}.json`;
 
         fetch(url)
@@ -99,7 +99,7 @@ const ReferenceEngine = {
                 this.renderProgressions();
             })
             .catch(err => {
-                // Fallback to local hardcoded database if offline [1]
+                // Fallback to local hardcoded database if offline  .
                 if (this.fallbackProgressions[directoryId]) {
                     this.activeProgressionList = this.fallbackProgressions[directoryId];
                     this.renderProgressions();

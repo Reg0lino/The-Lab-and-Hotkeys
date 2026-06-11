@@ -22,13 +22,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveBoardBtn = document.getElementById('save-board-btn');
     const saveAsBtn = document.getElementById('save-as-btn');
     
-    // Undo / Redo / Select elements [1]
+    // Undo / Redo / Select elements  .
     const undoBtn = document.getElementById('undo-btn');
     const redoBtn = document.getElementById('redo-btn');
     const selectAllBtn = document.getElementById('select-all-btn');
     const deselectAllBtn = document.getElementById('deselect-all-btn');
     
-    // Dedicated Multi-Delete Buttons [1]
+    // Dedicated Multi-Delete Buttons  .
     const deleteSelectedBoardBtn = document.getElementById('delete-selected-board-btn');
     const deleteSelectedDictBtn = document.getElementById('delete-selected-dict-btn');
     
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const suggestionsList = document.getElementById('suggestions-list');
     const saveAllSuggestionsBtn = document.getElementById('save-all-suggestions-btn');
     
-    // Bulk spawner buttons [1]
+    // Bulk spawner buttons  .
     const addTop5Btn = document.getElementById('add-top-5-btn');
     const addTop10Btn = document.getElementById('add-top-10-btn');
     const addTop20Btn = document.getElementById('add-top-20-btn');
@@ -52,14 +52,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let rhymeDebounceTimer = null;
 
-    // Master memory array for the dynamic randomizer [1]
+    // Master memory array for the dynamic randomizer  .
     window.masterVocabularyPool = [];
     // HOVER TO USE NUMMINUS for DELETE HOTKEY
-    window.hoveredCard = null; // Add this line to track hover states [1]
-    window.hoveredDictBadge = null; // Track dictionary badges for deletion [1]
+    window.hoveredCard = null; // Add this line to track hover states  .
+    window.hoveredDictBadge = null; // Track dictionary badges for deletion  .
 
 // ==========================================================================
-    // 2. IN-WINDOW PROMISE MODAL OVERLAYS (RESOLVES BROWSER POPUPS RISK) [1]
+    // 2. IN-WINDOW PROMISE MODAL OVERLAYS (RESOLVES BROWSER POPUPS RISK)  .
     // ==========================================================================
     window.customAlert = function(title, message) {
         return new Promise((resolve) => {
@@ -72,11 +72,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             titleEl.textContent = title.toUpperCase();
             bodyEl.textContent = message;
-            inputEl.style.display = 'none'; // Ensure prompt text input is hidden [1]
+            inputEl.style.display = 'none'; // Ensure prompt text input is hidden  .
             cancelBtn.style.display = 'none'; // Hide cancel button for simple alerts
             overlay.style.display = 'flex';
 
-            // Auto-focus the Confirm button for instant Enter confirmation [1]
+            // Auto-focus the Confirm button for instant Enter confirmation  .
             confirmBtn.focus();
 
             const onConfirm = () => {
@@ -100,11 +100,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             titleEl.textContent = title.toUpperCase();
             bodyEl.textContent = message;
-            inputEl.style.display = 'none'; // Ensure prompt text input is hidden [1]
+            inputEl.style.display = 'none'; // Ensure prompt text input is hidden  .
             cancelBtn.style.display = 'inline-block'; // Show cancel button for confirmations
             overlay.style.display = 'flex';
 
-            // Auto-focus the Confirm button for instant Enter confirmation [1]
+            // Auto-focus the Confirm button for instant Enter confirmation  .
             confirmBtn.focus();
 
             const cleanup = (result) => {
@@ -134,18 +134,18 @@ document.addEventListener('DOMContentLoaded', () => {
             titleEl.textContent = title.toUpperCase();
             bodyEl.textContent = message;
             
-            // Show prompt text input, pre-populate value, and select it [1]
+            // Show prompt text input, pre-populate value, and select it  .
             inputEl.value = defaultValue;
             inputEl.style.display = 'block';
             cancelBtn.style.display = 'inline-block';
             overlay.style.display = 'flex';
 
             inputEl.focus();
-            inputEl.select(); // Pre-selects text for immediate typing/overwriting [1]
+            inputEl.select(); // Pre-selects text for immediate typing/overwriting  .
 
             const cleanup = (result) => {
                 overlay.style.display = 'none';
-                inputEl.style.display = 'none'; // Hide text input again [1]
+                inputEl.style.display = 'none'; // Hide text input again  .
                 confirmBtn.removeEventListener('click', onConfirm);
                 cancelBtn.removeEventListener('click', onCancel);
                 inputEl.removeEventListener('keydown', onInputKeyDown);
@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ==========================================================================
-    // 3. DYNAMIC JSON THEME LOADER ENGINE [1]
+    // 3. DYNAMIC JSON THEME LOADER ENGINE  .
     // ==========================================================================
     const loadDynamicThemesList = () => {
         if (!themeSelect) return;
@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(themes => {
                 themeSelect.innerHTML = '';
                 
-                // Read local active choice from memory cache [1]
+                // Read local active choice from memory cache  .
                 const savedTheme = localStorage.getItem('the_lab_active_theme') || 'theme-g910';
                 
                 themes.forEach(t => {
@@ -212,11 +212,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     };
 
-    // Load active themes first [1]
+    // Load active themes first  .
     loadDynamicThemesList();
 
     // ==========================================================================
-    // 4. GLOBAL SPAWNER EXPOSITION (WITH ADVANCED INPUT CONTROLS) [1]
+    // 4. GLOBAL SPAWNER EXPOSITION (WITH ADVANCED INPUT CONTROLS)  .
     // ==========================================================================
     window.spawnCardElement = function(text, isCustom, left, top) {
         if (!board) return null;
@@ -227,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
         card.style.top = top + 'px';
         card.style.overflow = 'visible'; // Ensures hover elements sits outside boundary bounds
         
-        // Core Fix: Store the clean, raw word inside a custom HTML data attribute [1]
+        // Core Fix: Store the clean, raw word inside a custom HTML data attribute  .
         card.dataset.word = text;
         
         // Wrap text inside a child span to isolate from hover elements
@@ -235,7 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
         textSpan.textContent = text;
         card.appendChild(textSpan);
 
-        // Integrated: Glowing green hover-save '+' button [1]
+        // Integrated: Glowing green hover-save '+' button  .
         const savePlus = document.createElement('span');
         savePlus.className = 'card-save-plus';
         savePlus.textContent = '＋';
@@ -252,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         card.appendChild(savePlus);
 
-        // Double-click: Isolates and selects ONLY this card [1]
+        // Double-click: Isolates and selects ONLY this card  .
         card.addEventListener('dblclick', (e) => {
             e.stopPropagation();
             e.preventDefault();
@@ -268,7 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (typeof StorageEngine !== 'undefined') StorageEngine.saveActiveDraft();
         });
 
-        // Hover tracking: Sets window.hoveredCard dynamically on mouseenter/mouseleave [1]
+        // Hover tracking: Sets window.hoveredCard dynamically on mouseenter/mouseleave  .
         card.addEventListener('mouseenter', () => {
             window.hoveredCard = card;
         });
@@ -292,7 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof APIEngine !== 'undefined') APIEngine.init(customWordInput, apiModeSelect, suggestionsDrawer, suggestionsList, saveAllSuggestionsBtn);
 
     // ==========================================================================
-    // 6. CHORD TRANSPOSER ENGINE (Aligned to read flat JSON keys) [1]
+    // 6. CHORD TRANSPOSER ENGINE (Aligned to read flat JSON keys)  .
     // ==========================================================================
     const loadTranscribedChords = () => {
         if (!chordRootSelect || !chordTuningSelect || !chordTabsTableBody) return;
@@ -300,7 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const root = chordRootSelect.value;
         const group = chordTuningSelect.value;
         
-        // Save active selections to local storage cache [1]
+        // Save active selections to local storage cache  .
         localStorage.setItem('the_lab_active_chord_root', root);
         localStorage.setItem('the_lab_active_chord_group', group);
         
@@ -350,7 +350,7 @@ document.addEventListener('DOMContentLoaded', () => {
     chordRootSelect.addEventListener('change', loadTranscribedChords);
             chordTuningSelect.addEventListener('change', loadTranscribedChords);
             
-            // Retrieve and apply cached selections on startup [1]
+            // Retrieve and apply cached selections on startup  .
             const savedRoot = localStorage.getItem('the_lab_active_chord_root') || 'A';
             const savedGroup = localStorage.getItem('the_lab_active_chord_group') || 'group1';
             chordRootSelect.value = savedRoot;
@@ -360,7 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loadTranscribedChords();
 
     // ==========================================================================
-    // 7. DYNAMIC OFFLINE WORD POOL LOADER [1]
+    // 7. DYNAMIC OFFLINE WORD POOL LOADER  .
     // ==========================================================================
     const loadWordPool = (poolId, containerId) => {
         const container = document.getElementById(containerId);
@@ -374,7 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return response.json();
             })
             .then(words => {
-                // Dynamically concat loaded words directly to the master randomizer pool [1]
+                // Dynamically concat loaded words directly to the master randomizer pool  .
                 window.masterVocabularyPool = window.masterVocabularyPool.concat(words);
 
                 container.innerHTML = '';
@@ -399,7 +399,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     };
 
-    // Load static offline word files automatically on load [1]
+    // Load static offline word files automatically on load  .
     loadWordPool('verbs', 'verbs-bank');
     loadWordPool('nouns', 'nouns-bank');
     loadWordPool('adjectives', 'adjectives-bank');
@@ -407,7 +407,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadWordPool('particles', 'particles-bank');
 
     // ==========================================================================
-    // 8. MULTI-DRAFT UI BINDINGS (CUSTOM POPUPS TRANSITION) [1]
+    // 8. MULTI-DRAFT UI BINDINGS (CUSTOM POPUPS TRANSITION)  .
     // ==========================================================================
     createDraftBtn.addEventListener('click', () => {
         const name = newDraftInput.value.trim();
@@ -441,22 +441,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ==========================================================================
-    // 9. CUSTOM & BULK WORD SPAWNER BINDINGS [1]
+    // 9. CUSTOM & BULK WORD SPAWNER BINDINGS  .
     // ==========================================================================
     const triggerCustomWordSpawn = () => {
         const rawText = customWordInput.value.trim();
         if (!rawText) return;
         
-        // 1. Isolate question marks by padding them with spaces [1]
+        // 1. Isolate question marks by padding them with spaces  .
         let processed = rawText.replace(/\?/g, ' ? ');
         
-        // 2. Strip out all other forbidden punctuation (preserving only letters, numbers, spaces, apostrophes, question marks, and hyphens) [1]
+        // 2. Strip out all other forbidden punctuation (preserving only letters, numbers, spaces, apostrophes, question marks, and hyphens)  .
         processed = processed.replace(/[^\w\s'?-]/g, '');
         
-        // 3. Split the sanitized sentence into an array of separate words [1]
+        // 3. Split the sanitized sentence into an array of separate words  .
         const words = processed.trim().split(/\s+/);
         
-        // 4. Sequentially calculate coordinate positions and spawn cards [1]
+        // 4. Sequentially calculate coordinate positions and spawn cards  .
         words.forEach(word => {
             const coords = PlacementEngine.findOpenPosition(word, board);
             window.spawnCardElement(word, true, coords.left, coords.top);
@@ -472,7 +472,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Enter') triggerCustomWordSpawn();
     });
 
-    // Add Top 5 Suggestions [1]
+    // Add Top 5 Suggestions  .
     if (addTop5Btn) {
         addTop5Btn.addEventListener('click', () => {
             if (typeof APIEngine === 'undefined' || APIEngine.currentSuggestions.length === 0) return;
@@ -487,7 +487,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Add Top 10 Suggestions [1]
+    // Add Top 10 Suggestions  .
     if (addTop10Btn) {
         addTop10Btn.addEventListener('click', () => {
             if (typeof APIEngine === 'undefined' || APIEngine.currentSuggestions.length === 0) return;
@@ -517,7 +517,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Interactive 🎲 Random Word Spawner (Triggers live API fetch with active mode) [1]
+    // Interactive 🎲 Random Word Spawner (Triggers live API fetch with active mode)  .
     if (randomWordBtn) {
         randomWordBtn.addEventListener('click', () => {
             const hasPool = window.masterVocabularyPool && window.masterVocabularyPool.length > 0;
@@ -527,13 +527,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Pick a random word from the dynamically aggregated master vocabulary pool [1]
+            // Pick a random word from the dynamically aggregated master vocabulary pool  .
             const randomWord = window.masterVocabularyPool[Math.floor(Math.random() * window.masterVocabularyPool.length)];
 
-            // Inject the rolled word into the search input field [1]
+            // Inject the rolled word into the search input field  .
             customWordInput.value = randomWord;
 
-            // Trigger the live API search query immediately using your active dropdown query mode [1]
+            // Trigger the live API search query immediately using your active dropdown query mode  .
             if (typeof APIEngine !== 'undefined') {
                 APIEngine.query(randomWord, apiModeSelect.value);
             }
@@ -541,17 +541,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================================================
-    // 10. MULTI-SELECTION CONTROL BUTTONS [1]
+    // 10. MULTI-SELECTION CONTROL BUTTONS  .
     // ==========================================================================
     window.updateClearButtonState = function() {
         const selectedBoardCount = board.querySelectorAll('.magnet-card.selected').length;
         const selectedDictCount = document.querySelectorAll('.custom-badge-container.selected-badge').length;
         
-        // Selection board controls [1]
+        // Selection board controls  .
         if (deselectAllBtn) deselectAllBtn.disabled = selectedBoardCount === 0;
         if (deleteSelectedBoardBtn) deleteSelectedBoardBtn.disabled = selectedBoardCount === 0;
 
-        // Selection dictionary controls [1]
+        // Selection dictionary controls  .
         if (deleteSelectedDictBtn) deleteSelectedDictBtn.disabled = selectedDictCount === 0;
     };
 
@@ -575,20 +575,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Custom Dedicated Delete Selection on Board Click Handler (Resolved: Immediate deletion) [1]
+    // Custom Dedicated Delete Selection on Board Click Handler (Resolved: Immediate deletion)  .
     if (deleteSelectedBoardBtn) {
         deleteSelectedBoardBtn.addEventListener('click', () => {
             const selectedCards = Array.from(board.querySelectorAll('.magnet-card.selected'));
             if (selectedCards.length === 0) return;
 
-            // Resolved: Canvas board selection deletions are now instant with zero popups [1]
+            // Resolved: Canvas board selection deletions are now instant with zero popups  .
             selectedCards.forEach(c => c.remove());
             window.updateClearButtonState();
             StorageEngine.saveActiveDraft();
         });
     }
 
-    // Custom Dedicated Delete Selected from Dictionary Bank Click Handler (Resolved: Keeps modal warnings) [1]
+    // Custom Dedicated Delete Selected from Dictionary Bank Click Handler (Resolved: Keeps modal warnings)  .
     if (deleteSelectedDictBtn) {
         deleteSelectedDictBtn.addEventListener('click', async () => {
             const selectedBadges = Array.from(document.querySelectorAll('.custom-badge-container.selected-badge'));
@@ -598,7 +598,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (confirmed) {
                 const wordsToRemove = selectedBadges.map(el => el.querySelector('.word-badge').textContent.trim().toLowerCase());
                 
-                // Filter out from active dictionary memory bank [1]
+                // Filter out from active dictionary memory bank  .
                 StorageEngine.customDictionary = StorageEngine.customDictionary.filter(w => !wordsToRemove.includes(w));
                 
                 // Save and repaint
@@ -610,7 +610,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================================================
-    // 11. UNDO / REDO HISTORY CLICK ACTIONS [1]
+    // 11. UNDO / REDO HISTORY CLICK ACTIONS  .
     // ==========================================================================
     if (undoBtn) {
         undoBtn.addEventListener('click', () => {
@@ -625,7 +625,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 // ==========================================================================
-    // 13. SYSTEM BACKUP BINDINGS (JSON EXPORT/IMPORT) [1]
+    // 13. SYSTEM BACKUP BINDINGS (JSON EXPORT/IMPORT)  .
     // ==========================================================================
     const exportBackupBtn = document.getElementById('export-backup-btn');
     const importBackupBtn = document.getElementById('import-backup-btn');
@@ -655,7 +655,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-    // Hardware Keyboard listeners for Undo/Redo & Deletions [1]
+    // Hardware Keyboard listeners for Undo/Redo & Deletions  .
     document.addEventListener('keydown', async (e) => {
         // Ignore hotkeys if user is currently typing inside active fields
         if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'SELECT') {
@@ -665,9 +665,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const isZ = e.key.toLowerCase() === 'z';
         const isY = e.key.toLowerCase() === 'y';
         const isDelete = e.key === 'Delete' || e.key === 'Del';
-        const isNumpadMinus = e.code === 'NumpadSubtract'; // Numpad - key [1]
+        const isNumpadMinus = e.code === 'NumpadSubtract'; // Numpad - key  .
 
-        // 1. UNDO: Triggers on Ctrl+Z OR Ctrl+Alt+Z [1]
+        // 1. UNDO: Triggers on Ctrl+Z OR Ctrl+Alt+Z  .
         if (isZ && e.ctrlKey) {
             e.preventDefault();
             if (typeof StorageEngine !== 'undefined') {
@@ -675,7 +675,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // 2. REDO: Triggers on Ctrl+Y [1]
+        // 2. REDO: Triggers on Ctrl+Y  .
         if (isY && e.ctrlKey && !e.altKey) {
             e.preventDefault();
             if (typeof StorageEngine !== 'undefined') {
@@ -683,18 +683,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // 3. NUMPAD MINUS INSTANT HOVER VAPORIZATION [1]
+        // 3. NUMPAD MINUS INSTANT HOVER VAPORIZATION  .
         if (isNumpadMinus) {
             e.preventDefault();
             e.stopPropagation();
 
             if (window.hoveredCard) {
                 if (window.hoveredCard.classList.contains('selected')) {
-                    // Delete all currently highlighted cards immediately [1]
+                    // Delete all currently highlighted cards immediately  .
                     const selectedCards = Array.from(board.querySelectorAll('.magnet-card.selected'));
                     selectedCards.forEach(c => c.remove());
                 } else {
-                    // Delete only this targeted card immediately [1]
+                    // Delete only this targeted card immediately  .
                     window.hoveredCard.remove();
                 }
                 
@@ -704,20 +704,20 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // 4. DELETE SELECTIONS: Keyboard triggers [1]
+        // 4. DELETE SELECTIONS: Keyboard triggers  .
         if (isDelete) {
             const selectedCards = Array.from(board.querySelectorAll('.magnet-card.selected'));
             const selectedBadges = Array.from(document.querySelectorAll('.custom-badge-container.selected-badge'));
 
             if (selectedCards.length > 0) {
                 e.preventDefault();
-                // Resolved: Canvas board keyboard deletions are now instant with zero popups [1]
+                // Resolved: Canvas board keyboard deletions are now instant with zero popups  .
                 selectedCards.forEach(c => c.remove());
                 window.updateClearButtonState();
                 StorageEngine.saveActiveDraft();
             } else if (selectedBadges.length > 0) {
                 e.preventDefault();
-                // Resolved: Saved dictionary deletions strictly retain modal warning popups [1]
+                // Resolved: Saved dictionary deletions strictly retain modal warning popups  .
                 const confirmed = await window.customConfirm("Delete Saved Words", `Permanently delete all ${selectedBadges.length} selected words from your custom saved dictionary?`);
                 if (confirmed) {
                     const wordsToRemove = selectedBadges.map(el => el.querySelector('.word-badge').textContent.trim().toLowerCase());
@@ -749,7 +749,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ==========================================================================
-    // 12. CANVAS SYSTEM UTILITIES (COPY TEXT, CLEAR BOARD, CLEAR DICTIONARY, SAVE BOARD) [1]
+    // 12. CANVAS SYSTEM UTILITIES (COPY TEXT, CLEAR BOARD, CLEAR DICTIONARY, SAVE BOARD)  .
     // ==========================================================================
     copyTextBtn.addEventListener('click', () => {
         const cards = Array.from(board.querySelectorAll('.magnet-card'));
@@ -793,7 +793,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     clearBoardBtn.addEventListener('click', async () => {
-        // Aligned: "Clear Board" strictly clears whole board. Custom button handles selections [1]
+        // Aligned: "Clear Board" strictly clears whole board. Custom button handles selections  .
         const confirmed = await window.customConfirm("Clear Board", "Are you sure you want to clear all active word cards from your canvas?");
         if (confirmed) {
             board.innerHTML = '';
@@ -812,13 +812,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-// Integrated: Save As click handler (Prompts for custom named save) [1]
+// Integrated: Save As click handler (Prompts for custom named save)  .
     if (saveAsBtn) {
         saveAsBtn.addEventListener('click', async () => {
             const activeProject = StorageEngine.projects.find(p => p.id === StorageEngine.activeProjectId);
             if (!activeProject) return;
 
-            // Calls our custom in-window prompt, pre-populated with active draft name [1]
+            // Calls our custom in-window prompt, pre-populated with active draft name  .
             const newName = await window.customPrompt("Save As", "Enter a new name for this draft:", activeProject.name);
             if (newName && newName.trim()) {
                 StorageEngine.saveActiveProjectAs(newName.trim());
@@ -826,9 +826,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Integrated: New Draft Safety Shield (Prompts for custom named save on unsaved changes) [1]
+    // Integrated: New Draft Safety Shield (Prompts for custom named save on unsaved changes)  .
     if (createDraftBtn) {
-        // We override the default click listener to add our safety check first [1]
+        // We override the default click listener to add our safety check first  .
         createDraftBtn.replaceWith(createDraftBtn.cloneNode(true)); // Strip old listener cleanly
         const freshCreateBtn = document.getElementById('create-draft-btn');
         
@@ -836,12 +836,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const name = newDraftInput.value.trim();
             if (!name) return;
 
-            // If there are unsaved changes on the active board, prompt to save them first [1]
+            // If there are unsaved changes on the active board, prompt to save them first  .
             if (window.hasUnsavedChanges) {
                 const confirmed = await window.customConfirm("Unsaved Changes", "You have unsaved changes on your active board. Would you like to save them first before starting a new sketch?");
                 if (confirmed) {
                     const activeProject = StorageEngine.projects.find(p => p.id === StorageEngine.activeProjectId);
-                    // Calls custom in-window prompt, pre-populated with active draft name [1]
+                    // Calls custom in-window prompt, pre-populated with active draft name  .
                     const newName = await window.customPrompt("Save As", "Enter a name to save your active draft:", activeProject ? activeProject.name : 'sketch');
                     if (newName && newName.trim()) {
                         StorageEngine.saveActiveProjectAs(newName.trim());

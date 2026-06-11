@@ -6,13 +6,13 @@
 const StorageEngine = {
     storageKey: 'the_lab_lyric_projects',
     activeProjectIdKey: 'the_lab_active_project_id',
-    customDictionaryKey: 'the_lab_custom_dictionary', // Dynamic user vocabulary cache [1]
+    customDictionaryKey: 'the_lab_custom_dictionary', // Dynamic user vocabulary cache  .
     
     projects: [],
     activeProjectId: null,
-    customDictionary: [], // Active vocabulary array in memory [1]
+    customDictionary: [], // Active vocabulary array in memory  .
     
-    // Internal History Stacks [1]
+    // Internal History Stacks  .
     undoStack: [],
     redoStack: [],
     
@@ -43,7 +43,7 @@ const StorageEngine = {
             localStorage.setItem(this.activeProjectIdKey, this.activeProjectId);
         }
 
-        // 2. Load custom dictionary bank [1]
+        // 2. Load custom dictionary bank  .
         const rawDict = localStorage.getItem(this.customDictionaryKey);
         if (rawDict) {
             try { this.customDictionary = JSON.parse(rawDict); }
@@ -56,7 +56,7 @@ const StorageEngine = {
     },
 
     /**
-     * Pushes a history state string onto the undo stack and clears redo stack [1]
+     * Pushes a history state string onto the undo stack and clears redo stack  .
      */
     pushHistoryState(jsonString) {
         this.redoStack = [];
@@ -65,7 +65,7 @@ const StorageEngine = {
 
         this.undoStack.push(jsonString);
         
-        // Enforce strict 4-step history cap [1]
+        // Enforce strict 4-step history cap  .
         if (this.undoStack.length > 4) {
             this.undoStack.shift();
         }
@@ -75,7 +75,7 @@ const StorageEngine = {
     },
 
     /**
-     * Pops previous state and steps back [1]
+     * Pops previous state and steps back  .
      */
     executeUndo() {
         if (this.undoStack.length === 0) return;
@@ -83,7 +83,7 @@ const StorageEngine = {
         const activeProject = this.projects.find(p => p.id === this.activeProjectId);
         if (!activeProject) return;
 
-        // Push current active state to redo stack [1]
+        // Push current active state to redo stack  .
         const currentState = JSON.stringify(activeProject.words);
         this.redoStack.push(currentState);
         
@@ -94,9 +94,9 @@ const StorageEngine = {
         const previousState = JSON.parse(this.undoStack.pop());
         activeProject.words = previousState;
 
-        // Resolved: Load first, save second to prevent current DOM overwrite loops [1]
+        // Resolved: Load first, save second to prevent current DOM overwrite loops  .
         this.loadActiveDraft();
-        this.saveActiveDraft(true); // Pass true to bypass pushing history again [1]
+        this.saveActiveDraft(true); // Pass true to bypass pushing history again  .
 
         const undoBtn = document.getElementById('undo-btn');
         if (undoBtn) undoBtn.disabled = this.undoStack.length === 0;
@@ -107,7 +107,7 @@ const StorageEngine = {
     },
 
     /**
-     * Pops next state and steps forward [1]
+     * Pops next state and steps forward  .
      */
     executeRedo() {
         if (this.redoStack.length === 0) return;
@@ -115,7 +115,7 @@ const StorageEngine = {
         const activeProject = this.projects.find(p => p.id === this.activeProjectId);
         if (!activeProject) return;
 
-        // Push current active state to undo stack [1]
+        // Push current active state to undo stack  .
         const currentState = JSON.stringify(activeProject.words);
         this.undoStack.push(currentState);
         
@@ -126,7 +126,7 @@ const StorageEngine = {
         const nextState = JSON.parse(this.redoStack.pop());
         activeProject.words = nextState;
 
-        // Resolved: Load first, save second [1]
+        // Resolved: Load first, save second  .
         this.loadActiveDraft();
         this.saveActiveDraft(true);
 
@@ -139,7 +139,7 @@ const StorageEngine = {
     },
 
     /**
-     * Appends a single word to the persistent dictionary list, preventing duplicates [1]
+     * Appends a single word to the persistent dictionary list, preventing duplicates  .
      */
     addWordToCustomDictionary(word) {
         const cleaned = word.trim().toLowerCase();
@@ -153,7 +153,7 @@ const StorageEngine = {
     },
 
     /**
-     * Merges an array of words (like a "Save All" query) into the custom dictionary [1]
+     * Merges an array of words (like a "Save All" query) into the custom dictionary  .
      */
     async saveAllToCustomDictionary(wordsArray) {
         if (!wordsArray || wordsArray.length === 0) return;
@@ -171,7 +171,7 @@ const StorageEngine = {
             localStorage.setItem(this.customDictionaryKey, JSON.stringify(this.customDictionary));
             this.renderCustomDictionaryBank();
             this.triggerVisualSavedIndicator();
-            // Custom modal alert instead of browser alert [1]
+            // Custom modal alert instead of browser alert  .
             await window.customAlert("Dictionary Updated", `Successfully added ${addedCount} new words to your custom dictionary.`);
         } else {
             await window.customAlert("Custom Dictionary", "All suggested words are already stored in your custom dictionary.");
@@ -179,7 +179,7 @@ const StorageEngine = {
     },
 
     /**
-     * Generates and downloads a clean .txt file of your custom vocabulary [1]
+     * Generates and downloads a clean .txt file of your custom vocabulary  .
      */
     async exportDictionaryAsTXT() {
         if (this.customDictionary.length === 0) {
@@ -199,7 +199,7 @@ const StorageEngine = {
     },
 
     /**
-     * Wipes out all saved words inside your custom vocabulary cache [1]
+     * Wipes out all saved words inside your custom vocabulary cache  .
      */
     clearCustomDictionary() {
         this.customDictionary = [];
@@ -209,7 +209,7 @@ const StorageEngine = {
     },
 
     /**
-     * Renders the custom saved words inside their own distinct UI section [1]
+     * Renders the custom saved words inside their own distinct UI section  .
      */
     renderCustomDictionaryBank() {
         const bankContainer = document.getElementById('custom-user-dictionary-bank');
@@ -238,13 +238,13 @@ const StorageEngine = {
 
             // Clicking the custom word spawns it on the canvas
             badge.addEventListener('click', (e) => {
-                // Interactive: Ctrl-Click / Cmd-Click multi-selection on dictionary badges [1]
+                // Interactive: Ctrl-Click / Cmd-Click multi-selection on dictionary badges  .
                 if (e.ctrlKey || e.metaKey) {
                     e.preventDefault();
                     e.stopPropagation();
                     badgeContainer.classList.toggle('selected-badge');
                     
-                    // Aligned: Updates the active/disabled status of your Delete Selected button [1]
+                    // Aligned: Updates the active/disabled status of your Delete Selected button  .
                     if (typeof window.updateClearButtonState === 'function') {
                         window.updateClearButtonState();
                     }
@@ -258,13 +258,13 @@ const StorageEngine = {
                 }
             });
 
-            // Clean Deletion: Tiny hover-X element decouples deletion from clicking [1]
+            // Clean Deletion: Tiny hover-X element decouples deletion from clicking  .
             const deleteIcon = document.createElement('span');
             deleteIcon.className = 'dictionary-badge-delete-x';
             deleteIcon.textContent = '✕';
             deleteIcon.title = "Delete from dictionary bank (Click to delete)";
             
-            // Re-written: uses window.customConfirm to prevent browser alerts [1]
+            // Re-written: uses window.customConfirm to prevent browser alerts  .
             deleteIcon.addEventListener('click', async (e) => {
                 e.stopPropagation(); // Stop card from spawning on board
                 const confirmed = await window.customConfirm("Remove Word", `Are you sure you want to remove "${word}" from your saved custom dictionary?`);
@@ -292,7 +292,7 @@ const StorageEngine = {
         const cards = Array.from(this.boardElement.querySelectorAll('.magnet-card'));
         const wordData = cards.map(card => {
             return {
-                // Aligned Fix: Read from clean custom dataset instead of textContent [1]
+                // Aligned Fix: Read from clean custom dataset instead of textContent  .
                 text: card.dataset.word || card.textContent.trim(), 
                 isCustom: card.classList.contains('custom-word'),
                 isSelected: card.classList.contains('selected'), // Persist selections
@@ -303,12 +303,12 @@ const StorageEngine = {
 
         const pIndex = this.projects.findIndex(p => p.id === this.activeProjectId);
         if (pIndex !== -1) {
-            // Push history state to undo stack before saving new changes [1]
+            // Push history state to undo stack before saving new changes  .
             if (!isUndoRedoAction) {
                 const previousState = JSON.stringify(this.projects[pIndex].words);
                 this.pushHistoryState(previousState);
                 
-                // Set unsaved changes flag on user modifications [1]
+                // Set unsaved changes flag on user modifications  .
                 window.hasUnsavedChanges = true;
             }
 
@@ -317,7 +317,7 @@ const StorageEngine = {
         }
 
         localStorage.setItem(this.storageKey, JSON.stringify(this.projects));
-        this.syncDropdown(); // Re-renders dropdown to immediately display "*" [1]
+        this.syncDropdown(); // Re-renders dropdown to immediately display "*"  .
     },
 
     loadActiveDraft() {
@@ -354,7 +354,7 @@ const StorageEngine = {
         this.activeProjectId = uniqueId;
         localStorage.setItem(this.activeProjectIdKey, uniqueId);
 
-        // Wipe history on new draft creation [1]
+        // Wipe history on new draft creation  .
         this.undoStack = [];
         this.redoStack = [];
         const undoBtn = document.getElementById('undo-btn');
@@ -370,7 +370,7 @@ const StorageEngine = {
         this.activeProjectId = projectId;
         localStorage.setItem(this.activeProjectIdKey, projectId);
         
-        // Wipe history on draft switches [1]
+        // Wipe history on draft switches  .
         this.undoStack = [];
         this.redoStack = [];
         const undoBtn = document.getElementById('undo-btn');
@@ -396,7 +396,7 @@ const StorageEngine = {
             localStorage.setItem(this.activeProjectIdKey, this.activeProjectId);
         }
 
-        // Wipe history on deletion [1]
+        // Wipe history on deletion  .
         this.undoStack = [];
         this.redoStack = [];
         const undoBtn = document.getElementById('undo-btn');
@@ -417,7 +417,7 @@ const StorageEngine = {
             const opt = document.createElement('option');
             opt.value = p.id;
             
-            // If this is the active project and has unsaved changes, append "*" [1]
+            // If this is the active project and has unsaved changes, append "*"  .
             const isUnsaved = (p.id === this.activeProjectId && window.hasUnsavedChanges);
             opt.textContent = p.name + (isUnsaved ? ' *' : '');
             
@@ -427,11 +427,11 @@ const StorageEngine = {
     },
 
     /**
-     * Resolves: Deep-clones the active canvas layout under a new name [1]
+     * Resolves: Deep-clones the active canvas layout under a new name  .
      */
     saveActiveProjectAs(newName) {
         const activeProject = this.projects.find(p => p.id === this.activeProjectId);
-        const currentWords = activeProject ? JSON.parse(JSON.stringify(activeProject.words)) : []; // Deep-clone array [1]
+        const currentWords = activeProject ? JSON.parse(JSON.stringify(activeProject.words)) : []; // Deep-clone array  .
 
         const uniqueId = 'project_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
         const duplicatedProject = {
@@ -442,15 +442,15 @@ const StorageEngine = {
             words: currentWords
         };
 
-        // Add copy to local database array [1]
+        // Add copy to local database array  .
         this.projects.push(duplicatedProject);
         localStorage.setItem(this.storageKey, JSON.stringify(this.projects));
 
-        // Switch active view to newly duplicated project ID [1]
+        // Switch active view to newly duplicated project ID  .
         this.activeProjectId = uniqueId;
         localStorage.setItem(this.activeProjectIdKey, uniqueId);
         
-        // Clear modified asterisk flag on explicit named saves [1]
+        // Clear modified asterisk flag on explicit named saves  .
         window.hasUnsavedChanges = false;
 
         this.syncDropdown();
@@ -459,7 +459,7 @@ const StorageEngine = {
     },
 
     /**
-     * Serializes all song drafts, user dictionaries, and theme variables into a single downloadable JSON backup file [1]
+     * Serializes all song drafts, user dictionaries, and theme variables into a single downloadable JSON backup file  .
      */
     exportSystemBackup() {
         if (this.projects.length === 0) {
@@ -480,13 +480,13 @@ const StorageEngine = {
         const jsonString = JSON.stringify(backupData, null, 2);
         const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8' });
         
-        // Fetch active draft name, sanitize it into a safe filename, and append current date [1]
+        // Fetch active draft name, sanitize it into a safe filename, and append current date  .
         const activeProject = this.projects.find(p => p.id === this.activeProjectId);
         const rawName = activeProject ? activeProject.name : 'backup';
-        const safeName = rawName.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_'); // Replaces spaces/asterisks with clean underscores [1]
+        const safeName = rawName.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_'); // Replaces spaces/asterisks with clean underscores  .
         
         const today = new Date().toISOString().slice(0, 10).replace(/-/g, '_');
-        const fileName = `${safeName}_${today}.json`; // Compiles "[UserTitle]_[Date].json" [1]
+        const fileName = `${safeName}_${today}.json`; // Compiles "[UserTitle]_[Date].json"  .
 
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
@@ -497,19 +497,19 @@ const StorageEngine = {
     },
 
     /**
-     * Parses an uploaded JSON backup file and restores the entire workspace state [1]
+     * Parses an uploaded JSON backup file and restores the entire workspace state  .
      * @param {File} file - The uploaded .json file
      */
     importSystemBackup(file) {
         if (!file) return;
 
-        const reader = new FileReader(); // Native browser file reader [1]
+        const reader = new FileReader(); // Native browser file reader  .
         
         reader.onload = async (e) => {
             try {
-                const data = JSON.parse(e.target.result); // Parse uploaded text string [1]
+                const data = JSON.parse(e.target.result); // Parse uploaded text string  .
 
-                // Security Check: Verify structural identifier [1]
+                // Security Check: Verify structural identifier  .
                 if (data.app_identifier !== 'the_lab_backup') {
                     await window.customAlert("Invalid File", "This file is not a valid Lab backup configuration.");
                     return;
@@ -550,7 +550,7 @@ const StorageEngine = {
             }
         };
 
-        reader.readAsText(file); // Trigger async read [1]
+        reader.readAsText(file); // Trigger async read  .
     },
 
     triggerVisualSavedIndicator() {
