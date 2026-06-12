@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const board = document.getElementById('canvas-board');
     const themeSelect = document.getElementById('theme-select');
     const draftSelect = document.getElementById('draft-select');
+    const openWorksheetBtn = document.getElementById('open-worksheet-btn');
     const newDraftInput = document.getElementById('new-draft-input');
     const createDraftBtn = document.getElementById('create-draft-btn');
     const deleteDraftBtn = document.getElementById('delete-draft-btn');
@@ -290,6 +291,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof StorageEngine !== 'undefined') StorageEngine.init(draftSelect, board);
     if (typeof ReferenceEngine !== 'undefined') ReferenceEngine.init(progressionDirSelect, progressionsTableBody);
     if (typeof APIEngine !== 'undefined') APIEngine.init(customWordInput, apiModeSelect, suggestionsDrawer, suggestionsList, saveAllSuggestionsBtn);
+
+    // ==========================================================================
+    // 5.5 WORKSHEET UI BINDINGS
+    // ==========================================================================
+    if (openWorksheetBtn) {
+        openWorksheetBtn.addEventListener('click', () => {
+            const modal = document.getElementById('worksheet-modal');
+            if (modal) modal.style.display = 'flex';
+        });
+    }
 
     // ==========================================================================
     // 6. CHORD TRANSPOSER ENGINE (Aligned to read flat JSON keys)

@@ -41,7 +41,7 @@
                 <!-- Added Save As button right next to the select dropdown -->
                 <div style="display: flex; gap: 8px; margin-bottom: 12px;">
                     <select id="draft-select" class="canvas-input" style="flex-grow: 1; height: 38px; margin-bottom: 0;"></select>
-                    <button id="save-as-btn" class="canvas-btn" style="height: 38px; color: var(--theme-color-1); border-color: var(--border-color);">Save As</button>
+                    <button id="save-as-btn" class="canvas-btn" style="height: 38px; color: var(--theme-color-1); border-color: var(--border-color);" title="Save current project under a new name">Save As</button>
                 </div>
                 
                 <!-- Restored: New Draft controls row -->
@@ -51,9 +51,16 @@
                 </div>
                 
                 <!-- Restored: Delete Active Sketch button -->
-                <button id="delete-draft-btn" class="canvas-btn" style="width: 100%; color: var(--theme-color-1); border-color: var(--border-color); background-color: transparent;">
+                <button id="delete-draft-btn" class="canvas-btn" style="width: 100%; color: var(--theme-color-1); border-color: var(--border-color); background-color: transparent;" title="Permanently delete the active draft">
                     Delete Active Sketch
                 </button>
+                </div>
+
+                <!-- SONGWRITING WORKSHEET SIDEBAR CONTROL -->
+                <div style="margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px;">
+                    <button id="open-worksheet-btn" class="canvas-btn" style="width: 100%; color: var(--theme-color-1); border-color: var(--theme-color-1);" title="Open the Songwriting Map Worksheet">
+                        📋 Songwriting Map
+                    </button>
             </div>
 
             <!-- SYSTEM BACKUP ENGINE (Correctly placed inside the vertical sidebar) -->
@@ -62,8 +69,8 @@
                     System Backup (.json)
                 </label>
                 <div style="display: flex; gap: 8px;">
-                    <button id="export-backup-btn" class="canvas-btn" style="flex-grow: 1;">Export Backup</button>
-                    <button id="import-backup-btn" class="canvas-btn" style="flex-grow: 1;">Import Backup</button>
+                    <button id="export-backup-btn" class="canvas-btn" style="flex-grow: 1;" title="Download all projects as a single backup file">Export Backup</button>
+                    <button id="import-backup-btn" class="canvas-btn" style="flex-grow: 1;" title="Restore projects from a previous backup file">Import Backup</button>
                 </div>
                 <!-- Hidden file input for native explorer file uploads -->
                 <input type="file" id="import-file-input" accept=".json" style="display: none;">
@@ -109,12 +116,12 @@
                         <div style="display: flex; gap: 10px;">
                             <button id="undo-btn" class="canvas-btn" title="Step Back (Ctrl+Z / Ctrl+Alt+Z)" style="color: var(--theme-color-1); border-color: var(--border-color);" disabled>⬎ Undo</button>
                             <button id="redo-btn" class="canvas-btn" title="Step Forward (Ctrl+Y)" style="color: var(--theme-color-1); border-color: var(--border-color);" disabled>⬈ Redo</button>
-                            <button id="select-all-btn" class="canvas-btn" style="color: var(--neon-green); border-color: var(--border-color);">Select All</button>
-                            <button id="deselect-all-btn" class="canvas-btn" style="color: var(--text-secondary); border-color: var(--border-color);" disabled>Deselect All</button>
-                            <button id="delete-selected-board-btn" class="canvas-btn" style="color: var(--neon-orange); border-color: var(--border-color);" disabled>Delete Selection</button>
-                            <button id="export-png-btn" class="canvas-btn" style="color: var(--theme-color-1); border-color: var(--border-color);">Snapshot PNG</button>
-                            <button id="copy-text-btn" class="canvas-btn" style="color: var(--neon-green); border-color: var(--border-color);">Copy Text</button>
-                            <button id="clear-board-btn" class="canvas-btn" style="color: var(--neon-orange); border-color: var(--border-color);">Clear Board</button>
+                            <button id="select-all-btn" class="canvas-btn" style="color: var(--neon-green); border-color: var(--border-color);" title="Select every word on the canvas">Select All</button>
+                            <button id="deselect-all-btn" class="canvas-btn" style="color: var(--text-secondary); border-color: var(--border-color);" disabled title="Clear current selection">Deselect All</button>
+                            <button id="delete-selected-board-btn" class="canvas-btn" style="color: var(--neon-orange); border-color: var(--border-color);" disabled title="Remove highlighted cards">Delete Selection</button>
+                            <button id="export-png-btn" class="canvas-btn" style="color: var(--theme-color-1); border-color: var(--border-color);" title="Save an image of your lyric arrangement">Snapshot PNG</button>
+                            <button id="copy-text-btn" class="canvas-btn" style="color: var(--neon-green); border-color: var(--border-color);" title="Copy lyrics to clipboard as formatted text">Copy Text</button>
+                            <button id="clear-board-btn" class="canvas-btn" style="color: var(--neon-orange); border-color: var(--border-color);" title="Wipe all cards from the canvas">Clear Board</button>
                         </div>
                     </div>
 
@@ -162,10 +169,10 @@
                 <div class="section-header">
                     <h2>&gt;_ MY SAVED VOCABULARY BANK</h2>
                     <div style="display: flex; gap: 10px;">
-                        <button id="export-dictionary-txt-btn" class="canvas-btn" style="color: var(--neon-green); border-color: var(--border-color);">Export Dictionary as TXT</button>
+                        <button id="export-dictionary-txt-btn" class="canvas-btn" style="color: var(--neon-green); border-color: var(--border-color);" title="Download saved words as a list">Export Dictionary as TXT</button>
                         <!-- Integrated: Delete Selected from dictionary bank button -->
-                        <button id="delete-selected-dict-btn" class="canvas-btn" style="color: var(--neon-orange); border-color: var(--border-color);" disabled>Delete Selected</button>
-                        <button id="clear-dictionary-btn" class="canvas-btn" style="color: var(--neon-orange); border-color: var(--border-color);">Clear Dictionary</button>
+                        <button id="delete-selected-dict-btn" class="canvas-btn" style="color: var(--neon-orange); border-color: var(--border-color);" disabled title="Remove highlighted words from bank">Delete Selected</button>
+                        <button id="clear-dictionary-btn" class="canvas-btn" style="color: var(--neon-orange); border-color: var(--border-color);" title="Wipe your entire custom vocabulary">Clear Dictionary</button>
                     </div>
                 </div>
                 <div class="callout" style="border-left-color: var(--neon-green); background-color: rgba(57, 255, 20, 0.01);">
@@ -493,6 +500,7 @@
     <script src="storage.js"></script>
     <script src="api.js"></script>
     <script src="reference.js"></script>
+    <script src="worksheet.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

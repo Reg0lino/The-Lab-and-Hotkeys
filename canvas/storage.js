@@ -301,6 +301,19 @@ const StorageEngine = {
             };
         });
 
+        // Scrape active worksheet values if the elements exist
+        const worksheetData = {};
+        for (let i = 1; i <= 15; i++) {
+            const el = document.getElementById(`ws-q${i}`);
+            if (el) worksheetData[`q${i}`] = el.value;
+        }
+        const mel = document.getElementById('ws-notes-melodic');
+        const img = document.getElementById('ws-notes-imagery');
+        const hok = document.getElementById('ws-notes-hook');
+        if (mel) worksheetData.melodic = mel.value;
+        if (img) worksheetData.imagery = img.value;
+        if (hok) worksheetData.hook = hok.value;
+
         const pIndex = this.projects.findIndex(p => p.id === this.activeProjectId);
         if (pIndex !== -1) {
             // Push history state to undo stack before saving new changes
@@ -313,6 +326,10 @@ const StorageEngine = {
             }
 
             this.projects[pIndex].words = wordData;
+            // Only update worksheet data if we actually found inputs (prevents wiping on init)
+            if (Object.keys(worksheetData).length > 0) {
+                this.projects[pIndex].worksheet = worksheetData;
+            }
             this.projects[pIndex].lastUpdated = Date.now();
         }
 
@@ -336,6 +353,19 @@ const StorageEngine = {
                 }
             }
         });
+
+        // Repopulate worksheet fields
+        const ws = project.worksheet || {};
+        for (let i = 1; i <= 15; i++) {
+            const el = document.getElementById(`ws-q${i}`);
+            if (el) el.value = ws[`q${i}`] || "";
+        }
+        const mel = document.getElementById('ws-notes-melodic');
+        const img = document.getElementById('ws-notes-imagery');
+        const hok = document.getElementById('ws-notes-hook');
+        if (mel) mel.value = ws.melodic || "";
+        if (img) img.value = ws.imagery || "";
+        if (hok) hok.value = ws.hook || "";
     },
 
     createDraft(name) {
@@ -345,7 +375,11 @@ const StorageEngine = {
             name: name || 'New Sketch',
             created: Date.now(),
             lastUpdated: Date.now(),
-            words: []
+            words: [],
+            worksheet: {
+                q1: "", q2: "", q3: "", q4: "", q5: "", q6: "", q7: "", q8: "", q9: "", q10: "", q11: "", q12: "", q13: "", q14: "", q15: "",
+                melodic: "", imagery: "", hook: ""
+            }
         };
 
         this.projects.push(newProject);
@@ -432,6 +466,7 @@ const StorageEngine = {
     async saveActiveProjectAs(newName) {
         const activeProject = this.projects.find(p => p.id === this.activeProjectId);
         const currentWords = activeProject ? JSON.parse(JSON.stringify(activeProject.words)) : []; // Deep-clone array [1]
+        const currentWorksheet = activeProject ? JSON.parse(JSON.stringify(activeProject.worksheet || {})) : {};
 
         const cleanedName = newName.trim();
 
@@ -456,6 +491,7 @@ const StorageEngine = {
 
             // 3. Overwrite the existing project's card layout with our active layout [1]
             existingProject.words = currentWords;
+            existingProject.worksheet = currentWorksheet;
             existingProject.lastUpdated = Date.now();
 
             // Switch active view to the overwritten project ID [1]
@@ -469,7 +505,8 @@ const StorageEngine = {
                 name: cleanedName,
                 created: Date.now(),
                 lastUpdated: Date.now(),
-                words: currentWords
+                words: currentWords,
+                worksheet: currentWorksheet
             };
 
             this.projects.push(duplicatedProject);
@@ -487,6 +524,187 @@ const StorageEngine = {
         this.syncDropdown();
         this.loadActiveDraft();
         this.triggerVisualSavedIndicator();
+    },
+
+    /**
+     * Exports the worksheet as a formatted plain text file
+     */
+    exportWorksheetAsTXT() {
+        const project = this.projects.find(p => p.id === this.activeProjectId);
+        if (!project) return;
+
+        const ws = project.worksheet || {};
+        const rawName = project.name;
+        const today = new Date().toISOString().slice(0, 10);
+
+        const report = `=================================================================
+SONGWRITING MAP: WORK SHEET // THE COMPANION LAB
+=================================================================
+Song Title : ${rawName}
+Date       : ${today}
+=================================================================
+
+SECTION 1: THE FOUNDATION (The Problem & The World)
+-----------------------------------------------------------------
+1.1 Core problem/tension:
+${ws.q1 || "(No response)"}
+
+1.2 The "Song World" (Imagery/Atmosphere):
+${ws.q2 || "(No response)"}
+
+1.3 Perspective (Who is singing/to whom):
+${ws.q3 || "(No response)"}
+
+1.4 The Setup (Leading to title):
+${ws.q4 || "(No response)"}
+
+
+SECTION 2: THE BUILD (Escalation & Consequences)
+-----------------------------------------------------------------
+2.1 How the tension escalates:
+${ws.q5 || "(No response)"}
+
+2.2 Immediate consequence:
+${ws.q6 || "(No response)"}
+
+2.3 Sensory Shift:
+${ws.q7 || "(No response)"}
+
+2.4 Narrative Progression:
+${ws.q8 || "(No response)"}
+
+2.5 Title Re-framing:
+${ws.q9 || "(No response)"}
+
+
+SECTION 3: THE RESOLUTION (Final Escalation & Future)
+-----------------------------------------------------------------
+3.1 Final breaking point:
+${ws.q10 || "(No response)"}
+
+3.2 The Pivot (Different perspective):
+${ws.q11 || "(No response)"}
+
+3.3 The Ideal:
+${ws.q12 || "(No response)"}
+
+3.4 Time Jump (One year later):
+${ws.q13 || "(No response)"}
+
+3.5 The Present Moment:
+${ws.q14 || "(No response)"}
+
+3.6 The Final Payoff:
+${ws.q15 || "(No response)"}
+
+
+SONG SUMMARY / NOTES
+-----------------------------------------------------------------
+Melodic Ideas: ${ws.melodic || "(None)"}
+Key Imagery:   ${ws.imagery || "(None)"}
+Final Hook:    ${ws.hook || "(None)"}
+
+=================================================================
+[EXPORT COMPLETE // GENERATED BY THE LAB]
+=================================================================`;
+
+        const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
+        const safeName = rawName.toLowerCase().replace(/[^a-z0-9]/g, '_');
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `song_map_${safeName}.txt`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    },
+
+    /**
+     * Copies the formatted worksheet ASCII report to the clipboard
+     */
+    async copyWorksheetToClipboard() {
+        const project = this.projects.find(p => p.id === this.activeProjectId);
+        if (!project) return;
+
+        const ws = project.worksheet || {};
+        const rawName = project.name;
+        const today = new Date().toISOString().slice(0, 10);
+
+        const report = `=================================================================
+SONGWRITING MAP: WORK SHEET // THE COMPANION LAB
+=================================================================
+Song Title : ${rawName}
+Date       : ${today}
+=================================================================
+
+SECTION 1: THE FOUNDATION (The Problem & The World)
+-----------------------------------------------------------------
+1.1 Core problem/tension:
+${ws.q1 || "(No response)"}
+
+1.2 The "Song World" (Imagery/Atmosphere):
+${ws.q2 || "(No response)"}
+
+1.3 Perspective (Who is singing/to whom):
+${ws.q3 || "(No response)"}
+
+1.4 The Setup (Leading to title):
+${ws.q4 || "(No response)"}
+
+
+SECTION 2: THE BUILD (Escalation & Consequences)
+-----------------------------------------------------------------
+2.1 How the tension escalates:
+${ws.q5 || "(No response)"}
+
+2.2 Immediate consequence:
+${ws.q6 || "(No response)"}
+
+2.3 Sensory Shift:
+${ws.q7 || "(No response)"}
+
+2.4 Narrative Progression:
+${ws.q8 || "(No response)"}
+
+2.5 Title Re-framing:
+${ws.q9 || "(No response)"}
+
+
+SECTION 3: THE RESOLUTION (Final Escalation & Future)
+-----------------------------------------------------------------
+3.1 Final breaking point:
+${ws.q10 || "(No response)"}
+
+3.2 The Pivot (Different perspective):
+${ws.q11 || "(No response)"}
+
+3.3 The Ideal:
+${ws.q12 || "(No response)"}
+
+3.4 Time Jump (One year later):
+${ws.q13 || "(No response)"}
+
+3.5 The Present Moment:
+${ws.q14 || "(No response)"}
+
+3.6 The Final Payoff:
+${ws.q15 || "(No response)"}
+
+
+SONG SUMMARY / NOTES
+-----------------------------------------------------------------
+Melodic Ideas: ${ws.melodic || "(None)"}
+Key Imagery:   ${ws.imagery || "(None)"}
+Final Hook:    ${ws.hook || "(None)"}
+
+=================================================================
+[EXPORT COMPLETE // GENERATED BY THE LAB]
+=================================================================`;
+
+        try {
+            await navigator.clipboard.writeText(report);
+        } catch (err) {
+            console.error("Failed to copy worksheet: ", err);
+        }
     },
 
     /**
