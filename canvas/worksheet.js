@@ -44,19 +44,23 @@ const Worksheet = {
                         <div style="display: flex; flex-direction: column; gap: 12px;">
                             <div>
                                 <label class="highlight-cyan" style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">1.1 What is the core problem, tension, or conflict driving this song?</label>
-                                <textarea id="ws-q1" class="canvas-input" style="height: 60px; resize: vertical;"></textarea>
+                                <textarea id="ws-q1" class="canvas-input" style="height: 60px;"></textarea>
+                                <div id="ws-q1-mirror" class="print-mirror"></div>
                             </div>
                             <div>
                                 <label class="highlight-cyan" style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">1.2 When and where does the "Song World" exist? (Describe the imagery/atmosphere):</label>
-                                <textarea id="ws-q2" class="canvas-input" style="height: 60px; resize: vertical;"></textarea>
+                                <textarea id="ws-q2" class="canvas-input" style="height: 60px;"></textarea>
+                                <div id="ws-q2-mirror" class="print-mirror"></div>
                             </div>
                             <div>
                                 <label class="highlight-cyan" style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">1.3 The Perspective: Who is singing, and to whom are they speaking?</label>
-                                <textarea id="ws-q3" class="canvas-input" style="height: 60px; resize: vertical;"></textarea>
+                                <textarea id="ws-q3" class="canvas-input" style="height: 60px;"></textarea>
+                                <div id="ws-q3-mirror" class="print-mirror"></div>
                             </div>
                             <div>
                                 <label class="highlight-cyan" style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">1.4 The Setup: How do these details lead the listener toward the SONG TITLE?</label>
-                                <textarea id="ws-q4" class="canvas-input" style="height: 60px; resize: vertical;"></textarea>
+                                <textarea id="ws-q4" class="canvas-input" style="height: 60px;"></textarea>
+                                <div id="ws-q4-mirror" class="print-mirror"></div>
                             </div>
                         </div>
                     </div>
@@ -66,23 +70,28 @@ const Worksheet = {
                         <div style="display: flex; flex-direction: column; gap: 12px;">
                             <div>
                                 <label class="highlight-cyan" style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">2.1 How does the problem or tension escalate in this section?</label>
-                                <textarea id="ws-q5" class="canvas-input" style="height: 60px; resize: vertical;"></textarea>
+                                <textarea id="ws-q5" class="canvas-input" style="height: 60px;"></textarea>
+                                <div id="ws-q5-mirror" class="print-mirror"></div>
                             </div>
                             <div>
                                 <label class="highlight-cyan" style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">2.2 What is the immediate consequence of the initial problem?</label>
-                                <textarea id="ws-q6" class="canvas-input" style="height: 60px; resize: vertical;"></textarea>
+                                <textarea id="ws-q6" class="canvas-input" style="height: 60px;"></textarea>
+                                <div id="ws-q6-mirror" class="print-mirror"></div>
                             </div>
                             <div>
                                 <label class="highlight-cyan" style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">2.3 The Sensory Shift: How else is the problem felt, heard, or seen now?</label>
-                                <textarea id="ws-q7" class="canvas-input" style="height: 60px; resize: vertical;"></textarea>
+                                <textarea id="ws-q7" class="canvas-input" style="height: 60px;"></textarea>
+                                <div id="ws-q7-mirror" class="print-mirror"></div>
                             </div>
                             <div>
                                 <label class="highlight-cyan" style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">2.4 Narrative Progression: What happens next in the story?</label>
-                                <textarea id="ws-q8" class="canvas-input" style="height: 60px; resize: vertical;"></textarea>
+                                <textarea id="ws-q8" class="canvas-input" style="height: 60px;"></textarea>
+                                <div id="ws-q8-mirror" class="print-mirror"></div>
                             </div>
                             <div>
                                 <label class="highlight-cyan" style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">2.5 Title Re-framing: How does this section set up the TITLE from a different angle?</label>
-                                <textarea id="ws-q9" class="canvas-input" style="height: 60px; resize: vertical;"></textarea>
+                                <textarea id="ws-q9" class="canvas-input" style="height: 60px;"></textarea>
+                                <div id="ws-q9-mirror" class="print-mirror"></div>
                             </div>
                         </div>
                     </div>
@@ -92,27 +101,33 @@ const Worksheet = {
                         <div style="display: flex; flex-direction: column; gap: 12px;">
                             <div>
                                 <label class="highlight-cyan" style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">3.1 What is the final escalation or "breaking point" of the conflict?</label>
-                                <textarea id="ws-q10" class="canvas-input" style="height: 60px; resize: vertical;"></textarea>
+                                <textarea id="ws-q10" class="canvas-input" style="height: 60px;"></textarea>
+                                <div id="ws-q10-mirror" class="print-mirror"></div>
                             </div>
                             <div>
                                 <label class="highlight-cyan" style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">3.2 The Pivot: What is a completely different way to think about this situation?</label>
-                                <textarea id="ws-q11" class="canvas-input" style="height: 60px; resize: vertical;"></textarea>
+                                <textarea id="ws-q11" class="canvas-input" style="height: 60px;"></textarea>
+                                <div id="ws-q11-mirror" class="print-mirror"></div>
                             </div>
                             <div>
                                 <label class="highlight-cyan" style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">3.3 The Ideal: How would you prefer the situation to be instead?</label>
-                                <textarea id="ws-q12" class="canvas-input" style="height: 60px; resize: vertical;"></textarea>
+                                <textarea id="ws-q12" class="canvas-input" style="height: 60px;"></textarea>
+                                <div id="ws-q12-mirror" class="print-mirror"></div>
                             </div>
                             <div>
                                 <label class="highlight-cyan" style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">3.4 Time Jump: What will this look like one year from now?</label>
-                                <textarea id="ws-q13" class="canvas-input" style="height: 60px; resize: vertical;"></textarea>
+                                <textarea id="ws-q13" class="canvas-input" style="height: 60px;"></textarea>
+                                <div id="ws-q13-mirror" class="print-mirror"></div>
                             </div>
                             <div>
                                 <label class="highlight-cyan" style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">3.5 The Present Moment: what is happening right now? How has it changed?</label>
-                                <textarea id="ws-q14" class="canvas-input" style="height: 60px; resize: vertical;"></textarea>
+                                <textarea id="ws-q14" class="canvas-input" style="height: 60px;"></textarea>
+                                <div id="ws-q14-mirror" class="print-mirror"></div>
                             </div>
                             <div>
                                 <label class="highlight-cyan" style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">3.6 The Final Payoff: How does this set up the TITLE in a way that feels different?</label>
-                                <textarea id="ws-q15" class="canvas-input" style="height: 60px; resize: vertical;"></textarea>
+                                <textarea id="ws-q15" class="canvas-input" style="height: 60px;"></textarea>
+                                <div id="ws-q15-mirror" class="print-mirror"></div>
                             </div>
                         </div>
                     </div>
@@ -122,15 +137,18 @@ const Worksheet = {
                         <div style="display: flex; flex-direction: column; gap: 12px;">
                             <div>
                                 <label class="highlight-cyan" style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">Melodic Ideas:</label>
-                                <textarea id="ws-notes-melodic" class="canvas-input" style="height: 50px; resize: vertical;"></textarea>
+                                <textarea id="ws-notes-melodic" class="canvas-input" style="height: 50px;"></textarea>
+                                <div id="ws-notes-melodic-mirror" class="print-mirror"></div>
                             </div>
                             <div>
                                 <label class="highlight-cyan" style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">Key Imagery Words:</label>
-                                <textarea id="ws-notes-imagery" class="canvas-input" style="height: 50px; resize: vertical;"></textarea>
+                                <textarea id="ws-notes-imagery" class="canvas-input" style="height: 50px;"></textarea>
+                                <div id="ws-notes-imagery-mirror" class="print-mirror"></div>
                             </div>
                             <div>
                                 <label class="highlight-cyan" style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">Final Lyrical Hook:</label>
-                                <textarea id="ws-notes-hook" class="canvas-input" style="height: 50px; resize: vertical;"></textarea>
+                                <textarea id="ws-notes-hook" class="canvas-input" style="height: 50px;"></textarea>
+                                <div id="ws-notes-hook-mirror" class="print-mirror"></div>
                             </div>
                         </div>
                     </div>
@@ -154,6 +172,11 @@ const Worksheet = {
                 font-family: var(--font-mono);
                 font-size: 12px;
                 outline: none;
+                resize: none;
+            }
+            .print-mirror {
+                display: none; /* Hidden on screen, shown via @media print in style.css */
+                white-space: pre-wrap;
             }
             #worksheet-modal textarea:focus {
                 border-color: var(--theme-color-1);
@@ -221,6 +244,9 @@ const Worksheet = {
 
         textareas.forEach(ta => {
             ta.addEventListener('input', () => {
+                const mirror = document.getElementById(`${ta.id}-mirror`);
+                if (mirror) mirror.textContent = ta.value;
+                
                 if (typeof StorageEngine !== 'undefined') {
                     StorageEngine.saveActiveDraft(true);
                 }

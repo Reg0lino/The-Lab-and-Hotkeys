@@ -766,15 +766,22 @@ tr:nth-child(even) {
     }
 
     #worksheet-modal textarea {
-        border: 1px solid #ccc !important; /* Slightly darker for better visibility when printed blank */
+        display: none !important;
+    }
+
+    .print-mirror {
+        display: block !important;
+        border: 1px solid #ccc !important;
         background: white !important;
         color: #000 !important;
-        display: block !important;
         width: 100% !important;
-        min-height: 80pt !important; /* Ensures space for handwriting */
+        min-height: 80pt !important;
         padding: 5pt !important;
         font-family: var(--font-sans) !important;
+        font-size: 13px !important;
         white-space: pre-wrap !important;
+        word-wrap: break-word !important;
+        overflow: visible !important;
     }
 
     #worksheet-modal .modal-title div, 

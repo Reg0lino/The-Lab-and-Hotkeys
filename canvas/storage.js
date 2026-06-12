@@ -358,14 +358,18 @@ const StorageEngine = {
         const ws = project.worksheet || {};
         for (let i = 1; i <= 15; i++) {
             const el = document.getElementById(`ws-q${i}`);
-            if (el) el.value = ws[`q${i}`] || "";
+            const mirror = document.getElementById(`ws-q${i}-mirror`);
+            const val = ws[`q${i}`] || "";
+            if (el) el.value = val;
+            if (mirror) mirror.textContent = val;
         }
         const mel = document.getElementById('ws-notes-melodic');
         const img = document.getElementById('ws-notes-imagery');
         const hok = document.getElementById('ws-notes-hook');
-        if (mel) mel.value = ws.melodic || "";
-        if (img) img.value = ws.imagery || "";
-        if (hok) hok.value = ws.hook || "";
+        
+        if (mel) { mel.value = ws.melodic || ""; document.getElementById('ws-notes-melodic-mirror').textContent = mel.value; }
+        if (img) { img.value = ws.imagery || ""; document.getElementById('ws-notes-imagery-mirror').textContent = img.value; }
+        if (hok) { hok.value = ws.hook || ""; document.getElementById('ws-notes-hook-mirror').textContent = hok.value; }
     },
 
     createDraft(name) {
