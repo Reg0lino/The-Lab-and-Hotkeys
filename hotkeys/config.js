@@ -1,13 +1,13 @@
 const CONFIG = {
     "g_keys": {
-        "G1": { "label": "Open Hotkey Page", "cmd": "System Script" },
-        "G2": { "label": "Consolidate Selection", "cmd": "Ctrl+Alt+C" },
-        "G3": { "label": "Render Armed Tracks", "cmd": "Alt+R" },
-        "G4": { "label": "Quick Route to Mixer", "cmd": "Ctrl+L" },
-        "G5": { "label": "Close All Windows", "cmd": "F12" },
-        "G6": { "label": "Quick Quantize", "cmd": "Shift+Q" },
-        "G7": { "label": "Clone Selected Channel", "cmd": "Alt+C" },
-        "G8": { "label": "Group Selected", "cmd": "Alt+G" },
+        "G1": { "label": "FL Shortcuts Script", "cmd": "Opens Hotkey Page" },
+        "G2": { "label": "Close All Windows", "cmd": "F12" },
+        "G3": { "label": "Save Mixer State", "cmd": "Ctrl+Shift+S" },
+        "G4": { "label": "Add Time Marker", "cmd": "Alt+T" },
+        "G5": { "label": "Open Plugin Picker", "cmd": "Ctrl+F8" },
+        "G6": { "label": "Clone Selected Channel", "cmd": "Alt+C" },
+        "G7": { "label": "Group Selected Channels", "cmd": "Alt+G" },
+        "G8": { "label": "Delete Selected Channels", "cmd": "Alt+Delete" },
         "G9": { "label": "Open Project Picker", "cmd": "Ctrl+F8" }
     },
     "mouse_keys": [
